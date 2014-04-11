@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="100%" height="100%" clipAndEnableScrolling="true"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			import skins.LeftButtonSkin;
+			import skins.MiddleButtonSkin;
+			import skins.RightButtonSkin;
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	
+	<s:HGroup width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" >
+		<s:Image id="irrigation" source="assets/water.png" width="80" height="48"  smooth="true"/>
+		<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+			<s:ToggleButton id="water1" color="white" width="25%" selected="false" click="water1.selected = true;water2.selected=false;water3.selected=false;water4.selected=false;"
+							label="1" skinClass="skins.LeftButtonSkin" />
+			<s:ToggleButton id="water2" color="white" width="25%" selected="false" click="water2.selected = true;water1.selected=false;water3.selected=false;water4.selected=false;"
+							label="2" skinClass="skins.MiddleButtonSkin" />
+			<s:ToggleButton id="water3" color="white" width="25%" selected="false" click="water3.selected = true;water1.selected=false;water2.selected=false;water4.selected=false;"
+							label="3" skinClass="skins.MiddleButtonSkin" />
+			<s:ToggleButton id="water4" color="white" width="25%" selected="false" click="water4.selected = true;water1.selected=false;water2.selected=false;water3.selected=false;"
+							label="4" skinClass="skins.RightButtonSkin" />
+		</s:HGroup>
+		<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="30%">
+			<s:ToggleButton id="waterOn" color="white" width="45%" selected="false" click="waterOn.selected = true;waterOff.selected=false;"
+							label="开" skinClass="skins.LeftButtonSkin" />
+			<s:ToggleButton id="waterOff" color="white" width="45%" selected="false" click="waterOff.selected = true;waterOn.selected=false;"
+							label="关" skinClass="skins.RightButtonSkin" />
+		</s:HGroup>
+		
+		<s:Image id="itime" source="assets/duration.png" width="80" height="48"  smooth="true"/>
+		<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="30%"    id="iSlider"  
+						 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="true"/>
+		<s:Image   source="assets/delIcon.png"  id="myDel" name="iDel" width="80" height="48"  smooth="true"/>
+	</s:HGroup>
+	
+</s:Group>

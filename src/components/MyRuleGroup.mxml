@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="100%" height="100%" clipAndEnableScrolling="true"
+		 >
+	
+	<fx:Script>
+		<![CDATA[
+			 
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	<s:HGroup horizontalAlign="center" width="100%" height="100%">
+		<s:Label text="控制组"  verticalAlign="middle"  textAlign="center" backgroundAlpha="0" width="10%"   fontSize="20" height="80%" color="#1d953f"/>
+		<s:Button id="rulebtn"  skinClass="skins.MyRuleButtonSkin" color="white"  horizontalCenter="0"   width="60%" label="设置"   height="80%"   fontSize="25"/>
+		<s:Label id="myTime" verticalAlign="middle"  textAlign="center" backgroundAlpha="0" width="30%"   fontSize="20" height="80%" color="#1d953f"/>
+		<s:Image id="myRuleDel" verticalAlign="middle"  source="assets/delIcon.png"    width="80" height="48"  smooth="true"/>
+	</s:HGroup>
+	
+</s:Group>

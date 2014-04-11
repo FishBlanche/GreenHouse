@@ -1,0 +1,1339 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark"  destructionPolicy="never" xmlns:mx="library://ns.adobe.com/flex/mx"  backgroundAlpha="0.3" initialize="init()"   creationComplete="create()" >
+		<fx:Style>
+		@namespace "library://ns.adobe.com/flex/spark";
+		.itextInput
+		{
+			skinClass:ClassReference("spark.skins.mobile.TextInputSkin");
+			showPromptWhenFocused: false;
+			borderVisible:false;
+		}
+		.iHSlider
+		{
+			color:white;
+			fontSize: 15;
+		}
+	</fx:Style>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			import mx.core.IVisualElement;
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			import mx.messaging.ChannelSet;
+			import mx.messaging.channels.AMFChannel;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.RemoteObject;
+			import mx.utils.StringUtil;
+			import mx.utils.UIDUtil;
+			
+			import spark.components.Group;
+			import spark.managers.PersistenceManager;
+			import spark.skins.mobile.TextInputSkin;
+			
+			import components.MyConditionGroup;
+			import components.MyFanGroup;
+			import components.MyHumiGroup;
+			import components.MyIrriGroup;
+			import components.MyRollerGroup;
+			import components.MyRuleGroup;
+			
+			import model.ControlGroup;
+			
+			import skins.MyButtonSkin;
+			[Bindable] [Embed (source="assets/myT.png")] private static var icon_T:Class;
+			[Bindable] [Embed (source="assets/myH.png")] private static var icon_H:Class;
+			[Bindable] [Embed (source="assets/myST.png")] private static var icon_ST:Class;
+			[Bindable] [Embed (source="assets/mySH.png")] private static var icon_SH:Class;
+			[Bindable] [Embed (source="assets/myL.png")] private static var icon_L:Class;
+			[Bindable] [Embed (source="assets/myPH.png")] private static var icon_PH:Class;
+			[Bindable] [Embed (source="assets/myCO.png")] private static var icon_CO:Class;
+			[Bindable] [Embed (source="assets/myCO2.png")] private static var icon_CO2:Class;
+		 
+			private	var dateFormatter:DateFormatter = new DateFormatter();    
+			private	var rg:MyRollerGroup;
+			private	var fg:MyFanGroup;
+			private var hg:MyHumiGroup;
+			private var ig:MyIrriGroup;
+			private var gpCollect:ArrayCollection=new ArrayCollection;
+			private var myAMF:AMFChannel=new AMFChannel();
+			private var channelSet:ChannelSet=new ChannelSet;
+			private var ro:RemoteObject = new RemoteObject();
+			private var ControlRo:RemoteObject = new RemoteObject();
+			private var DelControlRo:RemoteObject = new RemoteObject();
+			private var DCRo:RemoteObject = new RemoteObject();
+			private var FindRo:RemoteObject = new RemoteObject();
+		 	private var ipReg:RegExp =/^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)$/ ;
+			
+			private	var rgDel:MyRuleGroup;
+			private	var rgLook:MyRuleGroup;
+			private var mySensorType:int=1;
+		
+			[Bindable]
+			private var setType:String="";
+			[Bindable]
+			private var myMin:Number=-20;
+			[Bindable]
+			private var myMax:Number=70;
+			[Bindable]
+			private var isLogin:Boolean=false;
+			[Bindable]
+			private var isCamera:Boolean=false;
+			private var InnerMaxRoller:String="";
+			private var InnerMinRoller:String="";
+			private var OuterMaxRoller:String="";
+			private var OuterMinRoller:String="";
+			private  function init():void{
+				if(AccessServer())
+				{
+					FindRo.findControInfo();
+				}
+			}
+			private  function create():void{
+				uname.addEventListener(FlexEvent.ENTER,enter_submit);
+				upass.addEventListener(FlexEvent.ENTER,enter_submit);
+				cameraIp.addEventListener(FlexEvent.ENTER,cameraIp_submit);
+				var persistencemanager:PersistenceManager=new PersistenceManager();
+				if(persistencemanager.load())
+				{
+					if(persistencemanager.getProperty("uname"))
+					{
+						uname.text=persistencemanager.getProperty("uname").toString();
+					}
+					if(persistencemanager.getProperty("upword"))
+					{
+						upass.text=persistencemanager.getProperty("upword").toString();
+					}
+					if(persistencemanager.getProperty("cameraIp"))
+					{
+						cameraIp.text=persistencemanager.getProperty("cameraIp").toString();
+					}
+				}
+			}
+			private function enter_submit(event:FlexEvent):void{
+				lmessage.text="";
+				if(StringUtil.trim(uname.text)!=""&&StringUtil.trim(upass.text)!="")
+				{
+					var persistencemanager:PersistenceManager=new PersistenceManager();
+					if(persistencemanager.load())
+					{
+						persistencemanager.setProperty("uname",uname.text);
+						persistencemanager.setProperty("upword",upass.text);
+						persistencemanager.save();
+						if(persistencemanager.getProperty("serverAddress"))
+						{
+							myAMF.url=persistencemanager.getProperty("serverAddress").toString();
+							channelSet.addChannel(myAMF); 
+							ro.channelSet = channelSet;
+							ro.destination="UserService";//验证用户身份
+							ro.addEventListener(ResultEvent.RESULT,result_handler);
+							ro.addEventListener(FaultEvent.FAULT,faultHandle);
+							lmessage.text="正在登录----";
+							isLogin=false;
+							ro.queryUser(uname.text,upass.text);//请求服务端对用户的身份验证
+						}
+						else
+						{
+							lmessage.text="服务器地址未知";
+						}
+					}
+				}
+			}
+			private function cameraIp_submit(event:FlexEvent):void{
+				lmessage.text="";
+				if(ipReg.test(cameraIp.text))
+				{
+					var persistencemanager:PersistenceManager=new PersistenceManager();
+					if(persistencemanager.load())
+					{
+						persistencemanager.setProperty("cameraIp",cameraIp.text);
+						persistencemanager.save();
+						isCamera=false;
+						var ipStr:String="http://"+cameraIp.text;
+						var url:URLRequest = new URLRequest(ipStr);
+						navigateToURL(url, "_blank");
+					}
+				}
+				else
+				{
+					lmessage.text="IP地址格式错误";
+				}
+			}
+			private  function AutoControl_handler(e:ResultEvent):void{
+				lmessage.text="";
+				if(e.result=="")
+				{
+					lmessage.text="未登陆";
+				}
+				else if(e.result=="fail")
+				{
+					lmessage.text="其他用户在使用";
+				}
+				else
+				{
+				    var rs:Array=String(e.result).split(";");
+					if(setType=="添加")
+					{
+						lmessage.text="添加成功";
+						var cg:ControlGroup=new ControlGroup;
+						cg.gpId=rs[0];
+						cg.gpValue=rs[1]+";"+rs[2]+";"+rs[3];
+						gpCollect.addItem(cg);
+						gpCollect.refresh();
+					}
+					else
+					{
+						lmessage.text="修改成功";
+						for(var i:int=0;i<gpCollect.length;i++)
+						{
+							if(gpCollect.getItemAt(i).gpId==rs[0])
+							{
+								gpCollect.getItemAt(i).gpValue=rs[1]+";"+rs[2]+";"+rs[3];
+							}
+						}
+					}
+					AutoView();
+				    DelConditionAndControl();
+				}
+			}
+			private  function DelControl_handler(e:ResultEvent):void{
+				var result=e.result;
+				lmessage.text="";
+				if(e.result=="")
+				{
+					lmessage.text="未登陆";
+				}
+				else if(e.result=="fail")
+				{
+					lmessage.text="其他用户在使用";
+				}
+				else
+				{
+					lmessage.text="成功删除";
+					autovg.removeElement(rgDel);
+					for(var i:int=0;i<gpCollect.length;i++)
+					{
+						if(gpCollect.getItemAt(i).gpId==rgDel.rulebtn.label)
+						{
+							gpCollect.removeItemAt(i);
+							break;
+						}
+					}
+                }
+			}
+			private  function DCControl_handler(e:ResultEvent):void{
+				var result=e.result;
+				lmessage.text="";
+				if(e.result=="")
+				{
+					lmessage.text="未登陆";
+				}
+				else if(e.result=="fail")
+				{
+					lmessage.text="其他用户在使用";
+				}
+				else
+				{
+					lmessage.text="设置成功";
+				}
+			}
+			private  function findControlInfo_handler(e:ResultEvent):void{
+				//trace("findControlInfo_handler");
+				gpCollect.removeAll();
+				gpCollect=e.result as ArrayCollection;
+			 
+				//trace("gpCollect.length"+gpCollect.length);
+				
+			}
+			private  function result_handler(e:ResultEvent):void{
+				lmessage.text="";
+				FlexGlobals.topLevelApplication.currentUser="";
+				if(e.result!="")
+				{
+					var a:String=StringUtil.trim(e.result.toString());
+					FlexGlobals.topLevelApplication.currentUser=a;
+					lmessage.text="登录成功";
+					trace("currentUser"+a);
+				}
+				else
+				{
+					lmessage.text="该用户不存在";
+				}
+			}
+			private  function  faultHandle(event:FaultEvent):void
+			{ 
+				trace(" request error");
+				lmessage.text="";
+				lmessage.text="连接服务器失败";
+				trace(event.fault.faultString);
+				trace(event.fault.faultDetail);
+			}
+			private  function  AccessServer():Boolean
+			{ 
+				lmessage.text="";
+				var persistencemanager:PersistenceManager=new PersistenceManager();
+				if(persistencemanager.load())
+				{
+					if(persistencemanager.getProperty("serverAddress"))
+					{
+						myAMF.url=persistencemanager.getProperty("serverAddress").toString();
+						channelSet.addChannel(myAMF); 
+						ControlRo.channelSet = channelSet;
+						ControlRo.destination="AutoControlService";//验证用户身份
+						ControlRo.addEventListener(ResultEvent.RESULT,AutoControl_handler);
+						ControlRo.addEventListener(FaultEvent.FAULT,faultHandle);
+						DCRo.channelSet = channelSet;
+						DCRo.destination="DeviceControlService";//验证用户身份
+						DCRo.addEventListener(ResultEvent.RESULT,DCControl_handler);
+						DCRo.addEventListener(FaultEvent.FAULT,faultHandle);
+						FindRo.channelSet = channelSet;
+						FindRo.destination="FindSetting";//验证用户身份
+						FindRo.addEventListener(ResultEvent.RESULT,findControlInfo_handler);
+						FindRo.addEventListener(FaultEvent.FAULT,faultHandle);
+						DelControlRo.channelSet = channelSet;
+						DelControlRo.destination="DelControlService";//验证用户身份
+						DelControlRo.addEventListener(ResultEvent.RESULT,DelControl_handler);
+						DelControlRo.addEventListener(FaultEvent.FAULT,faultHandle);
+						return true;
+					}
+					else
+					{
+						lmessage.text="";
+						lmessage.text="服务器地址未知";
+						return false;
+					}
+				}
+				else
+				{
+					lmessage.text="";
+					lmessage.text="服务器地址未知";
+					return false;
+				}
+			}
+			private  function show_Camera():void{
+				lmessage.text="";
+				isCamera=true;
+			}
+			private  function show_LoginWindow():void{
+				lmessage.text="";
+				isLogin=true;
+			}
+			private function TypeChange(type:int,e:MouseEvent):void//选择传感器
+			{
+				mySensorType=type;//设置各个传感器的滑竿范围
+				var ve:MyConditionGroup=new MyConditionGroup;
+				switch(type)
+				{
+					case 1:myMin=-30;
+						myMax=100;//温度
+						ve.myPic.source=icon_T;
+						ve.myPic.name="1";
+						break;
+					case 2:myMin=0;
+						myMax=100;//湿度
+						ve.myPic.source=icon_H;
+						ve.myPic.name="2";
+						break;
+					case 3:myMin=-30;
+						myMax=70;//土壤温度
+						ve.myPic.source=icon_ST;
+						ve.myPic.name="3";
+						break;
+					case 4:myMin=0;
+						myMax=100;//土壤湿度
+						ve.myPic.source=icon_SH;
+						ve.myPic.name="4";
+						break;
+					case 5:myMin=0;
+						myMax=10000;//光照
+						ve.myPic.source=icon_L;
+						ve.myPic.name="5";
+						break;
+					case 6:myMin=0;
+						myMax=7;//土壤PH
+						ve.myPic.source=icon_PH;
+						ve.myPic.name="6";
+						break;
+					case 7:myMin=0;
+						myMax=200;//CO
+						ve.myPic.source=icon_CO;
+						ve.myPic.name="7";
+						break;
+					case 8:myMin=0;
+						myMax=5000;//CO2
+						ve.myPic.source=icon_CO2;
+						ve.myPic.name="8";
+						break;
+					default:break;
+				}
+				tem.alpha=0.4;
+				hum.alpha=0.4;
+				stemp.alpha=0.4;
+				shum.alpha=0.4;
+				l.alpha=0.4;
+				ph.alpha=0.4;
+				co.alpha=0.4;
+				co2.alpha=0.4;
+				(e.currentTarget as Image).alpha=1;
+				ve.mySlider.minimum=myMin;
+				ve.mySlider.maximum=myMax;
+				ve.width=this.width;
+				ve.height=this.height*0.15;
+				ve.myDel.addEventListener(MouseEvent.CLICK,conditionDel_Handle);
+				vg.addElementAt(ve,vg.numChildren-1);
+				if(vg.numChildren>3)
+				{
+					 //可以使用向后的按钮
+					after1.enabled=true;
+				}
+			}
+			private  function  mdgImg_Handle(evt:MouseEvent):void//选择设备
+			{
+				myRoller.alpha=0.3;
+				myFan.alpha=0.3;
+				myHumi.alpha=0.3;
+				myIrri.alpha=0.3;
+				(evt.currentTarget as Image).alpha=1;
+				switch((evt.currentTarget as Image).id)
+				{
+					case "myRoller":if(!rg)  
+					{
+						rg=new MyRollerGroup;
+						rg.width=this.width;
+						rg.height=this.height*0.15;
+						rg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+					    vg2.addElementAt(rg,vg2.numChildren-1);
+					}
+						break;
+					case "myFan": if(!fg)
+					{
+						fg=new MyFanGroup;
+						fg.width=this.width;
+						fg.height=this.height*0.15;
+						fg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(fg,vg2.numChildren-1);
+					}
+						break;
+					case "myHumi": if(!hg)
+					{
+						hg=new MyHumiGroup;
+						hg.width=this.width;
+						hg.height=this.height*0.15;
+						hg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(hg,vg2.numChildren-1);
+					}
+						break;
+					case "myIrri": if(!ig)
+					{
+						ig=new MyIrriGroup;
+						ig.width=this.width;
+						ig.height=this.height*0.15;
+						ig.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(ig,vg2.numChildren-1);
+					}
+					break;
+					default:break;
+				}
+				if(vg2.numChildren>3)
+				{
+					mySetting.enabled=true;
+				}
+			}
+			private  function ManualView():void
+			{ 
+				this.currentState="manual";
+				manualSet.alpha=1;
+				autoSet.alpha=0.5;
+			}
+			private  function AutoView():void
+			{ 
+				if(autovg)
+				{
+					var a:int=autovg.numChildren-1;
+					while(a>0)
+					{
+						
+						autovg.removeElementAt(0);
+						a--;
+					}
+				}
+				this.currentState="auto";
+				manualSet.alpha=0.5;
+				autoSet.alpha=1;
+				var valueArr:Array;
+				for(var i:int=0;i<gpCollect.length;i++)
+				{
+					trace(gpCollect.getItemAt(i).gpId+","+gpCollect.getItemAt(i).gpValue);
+					valueArr=String(gpCollect.getItemAt(i).gpValue).split(";");
+					var rgp:MyRuleGroup=new MyRuleGroup;
+					rgp.width=this.width*0.8;
+					rgp.height=this.height*0.1;
+					rgp.rulebtn.label=gpCollect.getItemAt(i).gpId;
+					rgp.rulebtn.addEventListener(MouseEvent.CLICK,look_Handle);
+					rgp.myTime.text = valueArr[2]; 
+					rgp.myRuleDel.addEventListener(MouseEvent.CLICK,RuleDel_Handle);
+					autovg.addElementAt(rgp,autovg.numChildren-1);
+				}
+			}
+			private  function  look_Handle(evt:MouseEvent):void
+			{ 
+				DelConditionAndControl();
+			    rgLook=((evt.currentTarget as Button).parent.parent) as MyRuleGroup;
+				this.currentState="condition";
+		        ConditionView();
+			}
+			private  function  RuleDel_Handle(evt:MouseEvent):void
+			{ 
+			//	autovg.removeElement(((evt.currentTarget as Image).parent.parent) as Group);
+				rgDel=((evt.currentTarget as Image).parent.parent) as MyRuleGroup;
+				var delgp:String="";
+				for(var i:int=0;i<gpCollect.length;i++)
+				{
+					if(gpCollect.getItemAt(i).gpId==rgDel.rulebtn.label)
+					{
+						//gpCollect.removeItemAt(i);
+						delgp=gpCollect.getItemAt(i).gpId+";"+gpCollect.getItemAt(i).gpValue;
+						break;
+					}
+				}
+				if(AccessServer())
+				{
+					lmessage.text="正在处理----";
+					DelControlRo.DelControlSet(delgp,FlexGlobals.topLevelApplication.currentUser);
+				}
+			}
+			private  function  controlDel_Handle(evt:MouseEvent):void
+			{ 
+				vg2.removeElement(((evt.currentTarget as Image).parent.parent) as Group);
+				switch((evt.currentTarget as Image).name)
+				{
+					case "rDel":rg.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						rg=null;
+						break;
+					case "fDel": fg.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						fg=null;
+						break;
+					case "hDel":hg.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						hg=null;
+						break;
+					case "iDel":ig.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						ig=null;
+					     break;
+					default:break;
+				}
+				if(vg2.numChildren<=3)
+				{
+					 //设置按钮不可用
+					mySetting.enabled=false;
+				}
+			}
+			private  function  conditionDel_Handle(evt:MouseEvent):void
+			{ 
+				//(evt.currentTarget as Image).alpha=0.3;
+				vg.removeElement(((evt.currentTarget as Image).parent.parent.parent) as Group);
+				if(vg.numChildren<=3)
+				{
+					//向后的按钮不可用
+					after1.enabled=false;
+				}
+			}
+			private  function  DelConditionAndControl():void
+			{
+				if(vg)
+				{
+					var vgTemp:int=vg.numChildren-3;
+					while(vgTemp>0)
+					{
+						vg.removeElementAt(2);
+						vgTemp--;
+					}
+					if(vg.numChildren<=3)
+					{
+						//向后的按钮不可用
+						after1.enabled=false;
+					}
+				}
+				if(vg2)
+				{
+					var vg2Temp:int=vg2.numChildren-3;
+					while(vg2Temp>0)
+					{
+						vg2.removeElementAt(2);
+						vg2Temp--;
+					}
+					if(vg2.numChildren<=3)
+					{
+						//设置按钮不可用
+						mySetting.enabled=false;
+					}
+				}
+				rg=null;fg=null;ig=null;hg=null;
+			}
+		
+			private  function before2Click():void
+			{
+				this.currentState="condition";
+			}
+			private  function ConditionView():void
+			{ 
+				
+				if(rgLook)
+				{
+					var lookgp:Array;
+					var lookStr:String;
+					var lookArr:Array;
+					for(var i:int=0;i<gpCollect.length;i++)
+					{
+						if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.label)
+						{
+							lookgp=String(gpCollect.getItemAt(i).gpValue).split(";");
+							lookStr=lookgp[0];
+							trace("lookStr"+lookStr);
+							lookArr=lookStr.split(":");
+							var tempArr:Array;
+							for(var j=0;j<lookArr.length;j++)
+							{
+								tempArr=String(lookArr[j]).split(",");
+								var cg:MyConditionGroup=new MyConditionGroup;
+								switch(tempArr[0])
+								{
+									case "1":myMin=-30;
+										myMax=100;//温度
+										cg.myPic.source=icon_T;
+										cg.myPic.name="1";
+										break;
+									case "2":myMin=0;
+										myMax=100;//湿度
+										cg.myPic.source=icon_H;
+										cg.myPic.name="2";
+										break;
+									case "3":myMin=-30;
+										myMax=70;//土壤温度
+										cg.myPic.source=icon_ST;
+										cg.myPic.name="3";
+										break;
+									case "4":myMin=0;
+										myMax=100;//土壤湿度
+										cg.myPic.source=icon_SH;
+										cg.myPic.name="4";
+										break;
+									case "5":myMin=0;
+										myMax=10000;//光照
+										cg.myPic.source=icon_L;
+										cg.myPic.name="5";
+										break;
+									case "6":myMin=0;
+										myMax=7;//土壤PH
+										cg.myPic.source=icon_PH;
+										cg.myPic.name="6";
+										break;
+									case "7":myMin=0;
+										myMax=200;//CO
+										cg.myPic.source=icon_CO;
+										cg.myPic.name="7";
+										break;
+									case "8":myMin=0;
+										myMax=5000;//CO2
+										cg.myPic.source=icon_CO2;
+										cg.myPic.name="8";
+										break;
+									default:break;
+								}
+								cg.mySlider.minimum=myMin;
+								cg.mySlider.maximum=myMax;
+								switch(tempArr[1])
+								{
+									case "1":cg.bigCheck.selected=true;
+										cg.smallCheck.selected=false;
+										break;
+									case "2":cg.bigCheck.selected=false;
+										cg.smallCheck.selected=true;
+										break;
+									default:break;
+								}
+								cg.mySlider.value=Number(tempArr[2]);
+								if(tempArr.length>3)
+								{
+									switch(tempArr[3])
+									{
+										case "a":cg.andCheck.selected=true;
+											     cg.orCheck.selected=false;
+											     break;
+										case "r":cg.andCheck.selected=false;
+										         cg.orCheck.selected=true;
+											     break;
+										default:break;
+									}
+								}
+							    cg.width=this.width;
+								cg.height=this.height*0.15;
+								cg.myDel.addEventListener(MouseEvent.CLICK,conditionDel_Handle);
+								vg.addElementAt(cg,vg.numChildren-1);
+							}
+						      setType="修改";
+							  after1.enabled=true;
+							  break;
+						}
+					}
+				}
+				else
+				{
+					this.currentState="condition";
+					setType="添加";
+				}
+			}
+		
+			private  function deviceView():void
+			{ 
+				if(vg2)
+				{
+					var vg2Temp:int=vg2.numChildren-3;
+					while(vg2Temp>0)
+					{
+						vg2.removeElementAt(2);
+						vg2Temp--;
+					}
+					if(vg2.numChildren<=3)
+					{
+						//设置按钮不可用
+						mySetting.enabled=false;
+					}
+				}
+				rg=null;fg=null;ig=null;hg=null;
+				this.currentState="device";
+				if(rgLook)
+				{
+					mySetting.enabled=true;
+					var lookgp:Array;
+					var rulegp:Array;
+					var ruleArr:Array;
+					for(var i:int=0;i<gpCollect.length;i++)
+					{
+						if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.label)
+						{
+							lookgp=String(gpCollect.getItemAt(i).gpValue).split(";");
+							rulegp=String(lookgp[1]).split("a");
+							trace("rulegp"+lookgp[1]);
+							for(var j:int=0;j<rulegp.length;j++)
+							{
+								
+								ruleArr=String(rulegp[j]).split(",");
+								switch(ruleArr[0])//设备的类型
+								{
+									case "4": rg=new MyRollerGroup;
+										       switch(ruleArr[1])
+											   {
+												      case "8":rg.iroller.selected=true;
+														       rg.oroller.selected=false;
+														       break;
+													  case "9":rg.iroller.selected=false;
+														  rg.oroller.selected=true;
+														      break;
+													  default:break;
+										       }
+											   switch(ruleArr[2])
+											   {
+												   case "0":rg.rollerOn.selected=true;rg.rollerOff.selected=false;rg.rollerRet.selected =false;
+													       break;
+												   case "1":rg.rollerOff.selected = true;rg.rollerOn.selected=false;rg.rollerRet.selected =false;
+													       break;
+												   case "2":rg.rollerRet.selected = true;rg.rollerOff.selected=false;rg.rollerOn.selected=false;
+													       break;
+												   default:break;
+											   }
+											   rg.rSlider.value=Number(ruleArr[3])/60;
+											   rg.width=this.width;
+											   rg.height=this.height*0.15;
+											   rg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+											   vg2.addElementAt(rg,vg2.numChildren-1);
+										       break;
+									case "2":fg=new MyFanGroup;
+										     switch(ruleArr[2])
+										     {
+											   case "0":fg.fanOn.selected = true;fg.fanOff.selected=false;
+												break;
+											   case "1":fg.fanOff.selected = true;fg.fanOn.selected=false;
+												break;
+											   default:break;
+										     }
+											 fg.fSlider.value=Number(ruleArr[3])/60;
+											 fg.width=this.width;
+											 fg.height=this.height*0.15;
+											 fg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+											 vg2.addElementAt(fg,vg2.numChildren-1);
+										      break;
+									case "3":hg=new MyHumiGroup;
+										     switch(ruleArr[2])
+										     {
+										    	case "0":hg.humidifierOn.selected = true;hg.humidifierOff.selected=false;
+												break;
+											    case "1":hg.humidifierOff.selected = true;hg.humidifierOn.selected=false;
+												break;
+											   default:break;
+										     }
+											 hg.hSlider.value =Number(ruleArr[3])/60;
+											 hg.width=this.width;
+											 hg.height=this.height*0.15;
+											 hg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+											 vg2.addElementAt(hg,vg2.numChildren-1);
+										      break;
+									case "1": ig=new MyIrriGroup;
+										switch(ruleArr[1])
+										{
+											case "1": ig.water1.selected = true;ig.water2.selected=false;ig.water3.selected=false;ig.water4.selected=false;
+											     	break;
+											case "2": ig.water2.selected = true;ig.water1.selected=false;ig.water3.selected=false;ig.water4.selected=false;
+												   break;
+											case "3": ig.water3.selected = true;ig.water1.selected=false;ig.water2.selected=false;ig.water4.selected=false;
+												    break;
+											case "4": ig.water4.selected = true; ig.water1.selected=false; ig.water2.selected=false; ig.water3.selected=false;
+												    break;
+											default:break;
+										}
+										switch(ruleArr[2])
+										{
+											case "0": ig.waterOn.selected = true;ig.waterOff.selected=false;
+												break;
+											case "1": ig.waterOff.selected = true;ig.waterOn.selected=false;
+												break;
+											 
+											default:break;
+										}
+										ig.iSlider.value=Number(ruleArr[3])/60;
+										ig.width=this.width;
+										ig.height=this.height*0.15;
+										ig.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(ig,vg2.numChildren-1);
+										    break;
+									default:break;
+								}
+							}
+						}
+					}
+				}
+				
+			}
+			private  function MySet():void
+			{ 
+				if(setType=="添加")
+				{
+					AutoControl_set("添加");//添加一条控制条件
+				}
+				else
+				{
+					AutoControl_set("修改");//添加一条控制条件
+				}
+		    }
+			private  function  AutoControl_set(setType:String):void
+			{
+				 var gpStr:String="";
+				 if(setType=="添加")
+				 {
+					 gpStr=UIDUtil.createUID()+";";
+					
+				 }
+				 else
+				 {
+					 for(var i:int=0;i<gpCollect.length;i++)
+					 {
+						 if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.label)
+						 {
+							 gpStr=gpCollect.getItemAt(i).gpId+";";
+						 }
+					 }
+				 }
+				 dateFormatter.formatString = "YYYY/MM/DD JJ:NN:SS";   
+				 var time:String = dateFormatter.format(new Date());   
+				 var mdgTemp:MyConditionGroup;
+				 for(var i:int=2;i<vg.numChildren-1;i++)
+				 {
+					 mdgTemp=vg.getElementAt(i) as MyConditionGroup;
+					 gpStr+=mdgTemp.myPic.name+",";
+					 if(mdgTemp.bigCheck.selected)
+					 {
+						 gpStr+="1,";//大于
+					 }
+					 else
+					 {
+						 gpStr+="2,";//小于
+					 }
+					 gpStr+=String(mdgTemp.mySlider.value);
+					 if(i!=vg.numChildren-2)
+					 {
+						 gpStr+=",";
+						 if(mdgTemp.andCheck.selected)
+						 {
+							 gpStr+="a";//与
+						 }
+						 else
+						 {
+							 gpStr+="r";//或
+						 }
+						 gpStr+=":";//
+					 }
+				 }
+				 gpStr+=";";
+				 if(rg)
+				 {
+					 gpStr+="4,";
+					 if(rg.iroller.selected)
+					 {
+						 gpStr+="8,";
+					 }
+					 else
+					 {
+						 gpStr+="9,";
+					 }
+					 if(rg.rollerOn.selected)
+					 {
+						 gpStr+="0,";
+					 }
+					 else if(rg.rollerOff.selected)
+					 {
+						 gpStr+="1,";
+					 }
+					 else
+					 {
+						 gpStr+="2,";
+					 }
+					 gpStr+=rg.rSlider.value*60;
+					 gpStr+="a";
+				 }
+				 if(fg)
+				 {
+					 gpStr+="2,5,";
+					 if(fg.fanOn.selected)
+					 {
+						 gpStr+="0,";
+					 }
+					 else
+					 {
+						 gpStr+="1,";
+					 }
+					 gpStr+=fg.fSlider.value*60;
+					 gpStr+="a";
+				 }
+				 if(hg)
+				 {
+					 gpStr+="3,7,";
+					 if(hg.humidifierOn.selected)
+					 {
+						 gpStr+="0,";
+					 }
+					 else
+					 {
+						 gpStr+="1,";
+					 }
+					 gpStr+=hg.hSlider.value*60;
+					 gpStr+="a";
+				 }
+				 if(ig)
+				 {
+					 gpStr+="1,";//类型
+					 if(ig.water1.selected)//编号
+					 {
+						 gpStr+="1,";
+					 }
+					 else if(ig.water2.selected)
+					 {
+						 gpStr+="2,";
+					 }
+					 else if(ig.water3.selected)
+					 {
+						 gpStr+="3,";
+					 }
+					 else
+					 {
+						 gpStr+="4,";
+					 }
+					 if(ig.waterOn.selected)
+					 {
+						 gpStr+="0,";
+					 }
+					 else
+					 {
+						 gpStr+="1,";
+					 }
+					 gpStr+=ig.iSlider.value*60;
+					 gpStr+="a";
+				 }
+				 gpStr=gpStr.substr(0,gpStr.length-1);
+				 gpStr+=";"+time;
+				 trace("添加或设置"+gpStr);
+				if(AccessServer())
+				{
+					lmessage.text="正在处理----";
+					ControlRo.ControlSet(gpStr,FlexGlobals.topLevelApplication.currentUser);
+				}
+			}
+			private  function  roller_set():void
+			{ 
+				trace("roller_set()");
+				lmessage.text="";
+				if(AccessServer())
+				{
+					if(roller1.selected)
+					{
+						if(rollerOn.selected)
+						{
+							DCRo.operation(4,8,iSlider1.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(rollerOff.selected)
+						{
+							DCRo.operation(4,8,iSlider1.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(rollerRet.selected)
+						{
+							DCRo.operation(4,8,iSlider1.value*60,2,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else if(roller2.selected)
+					{
+						if(rollerOn.selected)
+						{
+							DCRo.operation(4,9,iSlider1.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(rollerOff.selected)
+						{
+							DCRo.operation(4,9,iSlider1.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(rollerRet.selected)
+						{
+							DCRo.operation(4,9,iSlider1.value*60,2,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else
+					{
+						lmessage.text="未选择内/外遮阳";
+					}
+				}
+			}
+			private  function  fan_set():void
+			{ 
+				trace("fan_set()");
+				lmessage.text="";
+				if(AccessServer())
+				{
+					if(fan1.selected)
+					{
+						if(fanOn.selected)
+						{
+							DCRo.operation(2,5,iSlider2.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(fanOff.selected)
+						{
+							DCRo.operation(2,5,iSlider2.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else if(fan2.selected)
+					{
+						if(fanOn.selected)
+						{
+							DCRo.operation(2,6,iSlider2.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(fanOff.selected)
+						{
+							DCRo.operation(2,6,iSlider2.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else
+					{
+						lmessage.text="未指定风扇";
+					}
+				}
+			}
+			private  function  humidifier_set():void
+			{ 
+				trace("humidifier_set()");
+				lmessage.text="";
+				if(AccessServer())
+				{
+					if(humidifierOn.selected)
+					{
+						DCRo.operation(3,7,iSlider3.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+					}
+					else if(humidifierOff.selected)
+					{
+						DCRo.operation(3,7,iSlider3.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+					}
+					else
+					{
+						lmessage.text="未选择操作";
+					}
+				}
+			}
+			private  function  irrigation_set():void
+			{ 
+				trace("irrigation_set()");
+				
+				lmessage.text="";
+				if(AccessServer())
+				{
+					if(water1.selected)
+					{
+						if(waterOn.selected)
+						{
+							DCRo.operation(1,1,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(waterOff.selected)
+						{
+							DCRo.operation(1,1,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else if(water2.selected)
+					{
+						if(waterOn.selected)
+						{
+							DCRo.operation(1,2,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(waterOff.selected)
+						{
+							DCRo.operation(1,2,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else if(water3.selected)
+					{
+						if(waterOn.selected)
+						{
+							DCRo.operation(1,3,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(waterOff.selected)
+						{
+							DCRo.operation(1,3,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else if(water4.selected)
+					{
+						if(waterOn.selected)
+						{
+							DCRo.operation(1,4,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else if(waterOff.selected)
+						{
+							DCRo.operation(1,4,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						}
+						else
+						{
+							lmessage.text="未选择操作";
+						}
+					}
+					else
+					{
+						lmessage.text="未指定花洒";
+					}
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="manual" />
+		<s:State name="auto" />
+		<s:State name="condition" />
+		<s:State name="device" />
+	</s:states>
+	<s:navigationContent>
+		<s:HGroup includeInLayout="{isLogin}" visible="{isLogin}"  horizontalAlign="center" width="100%" height="100%" verticalCenter="0" verticalAlign="middle">
+			<s:Label  text="用户名" fontSize="25"  horizontalCenter="0" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
+			<s:TextInput styleName="itextInput" color="haloblue" verticalCenter="0" width="30%"    height="80%"  id="uname"  prompt="用户名"  skinClass="spark.skins.mobile.TextInputSkin" />
+			<s:Spacer width="5%"/>
+			<s:Label fontSize="25" text="密码" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
+			<s:TextInput styleName="itextInput" displayAsPassword="true" color="haloblue" horizontalCenter="0"   verticalCenter="0" width="30%"    height="80%"  id="upass"  prompt="密码"  skinClass="spark.skins.mobile.TextInputSkin" />
+		</s:HGroup>
+		<s:HGroup includeInLayout="{isCamera}" visible="{isCamera}"  horizontalAlign="center" width="100%" height="100%" verticalCenter="0" verticalAlign="middle">
+			<s:Label  text="摄像机IP" fontSize="25"  horizontalCenter="0" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
+			<s:TextInput styleName="itextInput" color="haloblue" verticalCenter="0" width="60%"    height="80%"  id="cameraIp"  prompt="摄像机IP"  skinClass="spark.skins.mobile.TextInputSkin" />
+		</s:HGroup>
+	</s:navigationContent>
+	<s:titleContent>
+		<s:Label   fontSize="15"  id="lmessage" color="#F00000" />
+	</s:titleContent>
+	<s:actionContent>
+		<s:Image smooth="true" source="@Embed('assets/loginIcon.png')" enabled="{!isCamera}" click="show_LoginWindow()" right="2"/>
+		<s:Spacer width="10"/>
+		<s:Image smooth="true" source="@Embed('assets/shexiang.png')" enabled="{!isLogin}" click="show_Camera()" right="2"/>
+	</s:actionContent>
+	<s:Scroller      id="scrllr1"      width="{this.width}" height="{this.height}">
+		<s:VGroup  id="vg1" width="{this.width}" height="{this.height}" horizontalAlign="center" verticalAlign="middle">
+			 <s:HGroup gap="10" includeIn="manual,auto" horizontalAlign="center"  width="{this.width}" height="{this.height*0.1}">
+				 <!--s:Image horizontalAlign="center" click="ManualView()"   id="manualSet" alpha="1" scaleMode="letterbox"    source="assets/manual.png" width="50%"   smooth="true"/>
+ 				 <s:Image  horizontalAlign="center" click="AutoView()" id="autoSet" alpha="0.5" scaleMode="letterbox"  source="assets/auto.png" width="50%"   smooth="true"/-->
+				 <s:Button color="white" skinClass="skins.MyControlButtonSkin"  height="100%" label="手动控制" chromeColor="green" click="ManualView()"   id="manualSet" width="45%" fontSize="25"/>
+				 <s:Button color="white" skinClass="skins.MyControlButtonSkin" height="100%" label="自动控制" chromeColor="green" click="AutoView()" id="autoSet" width="45%" alpha="0.3" fontSize="25"/>
+			 </s:HGroup>
+			<s:VGroup includeIn="manual" height="{this.height*0.8}" width="{this.width}" horizontalAlign="center">
+				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
+					<s:Image id="roller" source="assets/roller.png" width="15%" height="100%" smooth="true"  />
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+						
+						<s:ToggleButton id="roller1" color="white" width="45%" selected="false" click="roller1.selected = true;roller2.selected=false;"
+										label="内" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton id="roller2" color="white" width="45%" selected="false" click="roller2.selected = true;roller1.selected=false;"
+										label="外" skinClass="skins.RightButtonSkin" />
+					</s:HGroup>
+					<s:HGroup gap="0"  verticalAlign="middle" horizontalAlign="center" height="100%" width="25%">
+						
+						<s:ToggleButton  id="rollerOn" color="white" width="33%" selected="false" click="rollerOn.selected = true;rollerOff.selected=false;rollerRet.selected =false; "
+										 label="开" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton  id="rollerRet" color="white" width="33%" selected="false" click="rollerRet.selected = true;rollerOff.selected=false;rollerOn.selected=false;"
+										 label="停" skinClass="skins.MiddleButtonSkin" />
+						<s:ToggleButton  id="rollerOff" color="white" width="33%" selected="false" click="rollerOff.selected = true;rollerOn.selected=false;rollerRet.selected =false;"
+										 label="关" skinClass="skins.RightButtonSkin" />
+					</s:HGroup>
+					<s:Image id="rdur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					
+					<s:HGroup  height="100%" verticalAlign="middle" width="25%">
+						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider1"  
+									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+					</s:HGroup>
+					
+					<s:Button click="roller_set()" skinClass="skins.CustomizeButtonSkin" color="white"    width="10%" label="设置" horizontalCenter="0" verticalCenter="0"   height="60%"   fontSize="25"/>
+				</s:HGroup>
+				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
+					<s:Image id="fan"  source="assets/fan.png" width="15%" height="100%"  smooth="true"/>
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+						
+						<s:ToggleButton id="fan1" color="white" width="45%" selected="false" click="fan1.selected = true;fan2.selected=false;"
+										label="1" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton id="fan2" color="white" width="45%" selected="false" click="fan2.selected = true;fan1.selected=false;"
+										label="2" skinClass="skins.RightButtonSkin" />
+					</s:HGroup>
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+						
+						<s:ToggleButton id="fanOn" color="white" width="45%" selected="false" click="fanOn.selected = true;fanOff.selected=false;"
+										label="开" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton id="fanOff" color="white" width="45%" selected="false" click="fanOff.selected = true;fanOn.selected=false;"
+										label="关" skinClass="skins.RightButtonSkin" />
+					</s:HGroup>
+					<s:Image id="fdur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					
+					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
+						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider2"  
+									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+					</s:HGroup>
+					<s:Button click="fan_set()" skinClass="skins.CustomizeButtonSkin" color="white"    width="10%" label="设置" horizontalCenter="0" verticalCenter="0"   height="60%"   fontSize="25"/>
+				</s:HGroup>
+				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
+					<s:Image id="humidifier" source="assets/humidifier.png" width="15%" height="100%" smooth="true"/>
+					<s:Label text="" width="25%" height="100%"/>
+					<s:HGroup gap="0" verticalAlign="middle" horizontalAlign="center" height="100%" width="25%">
+						
+						<s:ToggleButton id="humidifierOn" color="white" width="45%" selected="false" click="humidifierOn.selected = true;humidifierOff.selected=false;"
+										label="开" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton id="humidifierOff" color="white" width="45%" selected="false" click="humidifierOff.selected = true;humidifierOn.selected=false;"
+										label="关" skinClass="skins.RightButtonSkin" />
+					</s:HGroup>
+					<s:Image id="hdur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					
+					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
+						
+						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider3"  
+									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+					</s:HGroup>
+					<s:Button click="humidifier_set()" skinClass="skins.CustomizeButtonSkin" color="white"    width="10%" label="设置" horizontalCenter="0" verticalCenter="0"   height="60%"   fontSize="25"/>
+				</s:HGroup>
+				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
+					<s:Image id="irrigation" source="assets/water.png" width="15%" height="100%"  smooth="true"/>
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+						<s:ToggleButton id="water1" color="white" width="25%" selected="false" click="water1.selected = true;water2.selected=false;water3.selected=false;water4.selected=false;"
+										label="1" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton id="water2" color="white" width="25%" selected="false" click="water2.selected = true;water1.selected=false;water3.selected=false;water4.selected=false;"
+										label="2" skinClass="skins.MiddleButtonSkin" />
+						<s:ToggleButton id="water3" color="white" width="25%" selected="false" click="water3.selected = true;water1.selected=false;water2.selected=false;water4.selected=false;"
+										label="3" skinClass="skins.MiddleButtonSkin" />
+						<s:ToggleButton id="water4" color="white" width="25%" selected="false" click="water4.selected = true;water1.selected=false;water2.selected=false;water3.selected=false;"
+										label="4" skinClass="skins.RightButtonSkin" />
+					</s:HGroup>
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+						<s:ToggleButton id="waterOn" color="white" width="45%" selected="false" click="waterOn.selected = true;waterOff.selected=false;"
+										label="开" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton id="waterOff" color="white" width="45%" selected="false" click="waterOff.selected = true;waterOn.selected=false;"
+										label="关" skinClass="skins.RightButtonSkin" />
+					</s:HGroup>
+					<s:Image id="idur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					
+					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
+						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider4"  
+									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+					</s:HGroup>
+					<s:Button click="irrigation_set()" skinClass="skins.CustomizeButtonSkin" color="white"  horizontalCenter="0" verticalCenter="0"   width="10%" label="设置"   height="60%"   fontSize="25"/>
+				</s:HGroup>
+			</s:VGroup>	 
+			<s:VGroup id="autovg" includeIn="auto" height="{this.height*0.8}" width="{this.width}" horizontalAlign="center">
+			    <s:Image  verticalAlign="middle" id="addIcon" source="assets/addIcon.png" click="rgLook=null;ConditionView()" width="80" height="48"   smooth="true"/>
+			 </s:VGroup>
+		</s:VGroup>
+</s:Scroller>
+<s:Scroller top="2"  includeIn="condition"    id="scrllr"      width="{this.width}" height="{this.height}">
+	<s:VGroup top="5"  id="vg" width="{this.width}" height="{this.height}" horizontalAlign="center" >
+		<s:HGroup top="2" width="100%" horizontalAlign="center">
+			<s:Image verticalAlign="middle" horizontalAlign="center"  id="leftdot2" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
+			<s:Label verticalAlign="middle" horizontalCenter="0"  text="条件设置" color="green" fontWeight="bold" fontSize="25"/>
+			<s:Image verticalAlign="middle"  horizontalAlign="center" id="rightdot2" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
+		</s:HGroup>
+		<s:HGroup width="{this.width}" height="{this.height*0.15}" horizontalAlign="center" verticalAlign="middle">
+			<s:Image   id="tem" source="{icon_T}" width="80" height="48"  click="TypeChange(1,event)" alpha="0.4"  smooth="true"/>
+			<s:Image  id="hum" source="{icon_H}" width="80"  height="48" click="TypeChange(2,event)" alpha="0.4"  smooth="true"/>
+			<s:Image id="stemp" source="{icon_ST}" width="80" height="48"  click="TypeChange(3,event)" alpha="0.4" smooth="true"/>
+			<s:Image id="shum"  source="{icon_SH}" width="80"  height="48" click="TypeChange(4,event)" alpha="0.4"  smooth="true"/>
+			<s:Image id="l" source="{icon_L}" width="80"   height="48" click="TypeChange(5,event)" alpha="0.4"  smooth="true"/>
+			<s:Image id="ph" source="{icon_PH}" width="80"  height="48" click="TypeChange(6,event)" alpha="0.4"  smooth="true"/>
+			<s:Image id="co" source="{icon_CO}" width="80"   height="48" click="TypeChange(7,event)" alpha="0.4" smooth="true"/>
+			<s:Image id="co2" source="{icon_CO2}" width="80"   height="48" click="TypeChange(8,event)" alpha="0.4" smooth="true"/>
+		</s:HGroup>
+		<s:HGroup    horizontalAlign="center">
+			<s:Image verticalAlign="middle" horizontalAlign="center"  id="before1"   click="DelConditionAndControl();AutoView()"   source="assets/before.png" width="80" height="48"   smooth="true"/>
+			<s:Image verticalAlign="middle"  horizontalAlign="center" id="after1" enabled="false" click="deviceView()" source="assets/after.png" width="80" height="48"   smooth="true"/>
+		</s:HGroup>
+	</s:VGroup>
+</s:Scroller>
+<s:VGroup top="5" includeIn="device"  id="vg2" width="{this.width}" height="{this.height}" horizontalAlign="center" >
+		<s:HGroup top="2" width="100%" horizontalAlign="center">
+			<s:Image verticalAlign="middle" horizontalAlign="center"  id="leftdot3" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
+			<s:Label verticalAlign="middle" horizontalCenter="0"  text="操作设置" color="green" fontWeight="bold" fontSize="25"/>
+			<s:Image verticalAlign="middle"  horizontalAlign="center" id="rightdot3" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
+		</s:HGroup>
+		<s:HGroup width="{this.width}" height="{this.height*0.15}" horizontalAlign="center" verticalAlign="middle">
+			<s:Image click="mdgImg_Handle(event)"   id="myRoller" source="assets/roller.png" width="80" height="48"  alpha="0.4"  smooth="true"/>
+			<s:Image click="mdgImg_Handle(event)" id="myFan" source="assets/fan.png" width="80"  height="48"  alpha="0.4"  smooth="true"/>
+			<s:Image click="mdgImg_Handle(event)" id="myHumi" source="assets/humidifier.png" width="80" height="48"  alpha="0.4"  smooth="true"/>
+			<s:Image click="mdgImg_Handle(event)" id="myIrri"  source="assets/water.png" width="80"  height="48"  alpha="0.4"  smooth="true"/>
+		</s:HGroup>
+		<s:HGroup    horizontalAlign="center">
+			<s:Image verticalAlign="middle" horizontalAlign="center"  id="before2" click="before2Click()"   source="assets/before.png" width="80" height="48"   smooth="true"/>
+			<s:Button id="mySetting" click="MySet()"  skinClass="skins.CustomizeButtonSkin" color="white" enabled="false"      label="{setType}"  width="100" height="48"  fontSize="25"/>
+		</s:HGroup>
+	</s:VGroup>
+</s:View>
+

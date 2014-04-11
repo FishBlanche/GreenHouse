@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Skin  xmlns:fx="http://ns.adobe.com/mxml/2009"
+			 xmlns:s="library://ns.adobe.com/flex/spark"
+			   >
+	
+	<fx:Script>
+		<![CDATA[
+			
+			 
+		]]>
+	</fx:Script>
+	
+	 
+	 <s:BusyIndicator  width="200" height="200" horizontalCenter="0" verticalCenter="0" id="busy" visible="true"   symbolColor="halogreen" >
+	 </s:BusyIndicator> 
+	
+</s:Skin>

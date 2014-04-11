@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<s:TabbedViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
+								  xmlns:s="library://ns.adobe.com/flex/spark"
+								  xmlns:controller="controller.*"
+								  xmlns:components="components.*"
+								  splashScreenImage="components.MyScreenImageSource"
+								  splashScreenMinimumDisplayTime="2000"
+								  splashScreenScaleMode="stretch" initialize="init()" creationComplete="create()" xmlns:mx="library://ns.adobe.com/flex/mx" >
+	
+	<fx:Declarations>
+		<!--controller:SensingFeed id="feed"/-->
+	</fx:Declarations>
+	<fx:Style source="styles.css"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+
+			[Bindable]
+			public var  GlobalBusy:Boolean = true;	
+			[Bindable]
+			public var newestSensingList:ArrayCollection=new ArrayCollection;
+			[Bindable]
+			public var selectedArea:int;
+			public var currentUser:String="";
+			private function init():void
+			{
+				
+			}
+			private function create():void
+			{
+				
+			
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:ViewNavigator width="100%" height="100%" label="监测" color="halogreen"
+					 firstView="views.GreenHouseView"
+					 icon="@Embed('assets/live.png')" />
+	
+	<s:ViewNavigator width="100%" height="100%"   color="halogreen"  label="控制"  firstView="views.MyControlView" icon="@Embed('assets/man.png')"/>
+	<s:ViewNavigator width="100%" height="100%"   color="halogreen"  label="摄像"  firstView="views.CameraView" icon="@Embed('assets/camera.png')"/>
+</s:TabbedViewNavigatorApplication>

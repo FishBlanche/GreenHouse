@@ -1,0 +1,43 @@
+@namespace "library://ns.adobe.com/flex/spark";
+
+
+TabbedViewNavigatorApplication
+{
+ 
+}
+
+TabbedViewNavigator #tabBar
+{ 
+	chromeColor: black;
+	color:halogreen;
+}
+ActionBar 
+{
+	chromeColor: black;
+	alpha:1;
+	 
+}
+View
+{
+	backgroundColor: #7fb80e;
+	color:haloblue;
+}
+
+List
+{
+	alternatingItemColors: #F0F0F0,#DCDCDC;
+	
+}
+
+.button
+{
+	
+	
+}
+
+global
+{
+	fontSize: 20;
+	fontFamily:"宋体", "Arial", "_sans";
+}
+
