@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark"    destructionPolicy="never"  backgroundAlpha="0.3"    xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" removedFromStage="remove_Handle()" creationComplete="create()">
+		xmlns:s="library://ns.adobe.com/flex/spark"  destructionPolicy="never"  backgroundAlpha="0.3"    xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" removedFromStage="remove_Handle()"  creationComplete="create()">
 		<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
 		.itextInput
@@ -11,6 +11,7 @@
 		}
 			
 	   .errorTip {
+		   
 					borderColor: #1d953f;
 				    color: white;
 				    fontSize: 14;
@@ -155,12 +156,12 @@
 			{
 				 
 				navigator.pushView(views.HistoryView,moteAreaMap);
-				FlexGlobals.topLevelApplication.selectedArea=3;
+				FlexGlobals.topLevelApplication.selectedArea=4;
 			}
 			private function rc4Click(evt:MouseEvent):void
 			{
 			    navigator.pushView(views.HistoryView,moteAreaMap);
-				FlexGlobals.topLevelApplication.selectedArea=4;
+				FlexGlobals.topLevelApplication.selectedArea=3;
 			}
 			private function remove_Handle():void
 			{
@@ -169,7 +170,8 @@
 			}
 			private function init():void
 			{
-				
+		// 	this.width=Capabilities.screenResolutionX;   
+		// 		this.height= Capabilities.screenResolutionY; 
 				var persistencemanager:PersistenceManager=new PersistenceManager();
 				if(persistencemanager.load())
 				{
@@ -381,7 +383,7 @@
 								}
 								moteAreaMap[img]=2;
 								   break;
-							case 3:img.x=init3X;
+							case 4:img.x=init3X;
 								   img.y=init3Y;
 								   if(init3X+140>rc3.x+rc3.width)
 							    	{
@@ -396,7 +398,7 @@
 							       	}
 								    moteAreaMap[img]=3;
 								     break;
-							case 4:img.x=init4X;
+							case 3:img.x=init4X;
 								   img.y=init4Y;
 								   if(init4X+140>rc4.x+rc4.width)
 								  {
@@ -548,12 +550,12 @@
 					}
 					else if(img.x>=rc3.x&&img.x<=(rc3.x+rc3.width)&&img.y>=rc3y&&img.y<=(rc3y+rc3.height))
 					{
-						moteAreaMap[e]=3;
+						moteAreaMap[e]=4;
 						//	trace("区域对应"+img.id+":"+moteAreaMap[e]);
 					}
 					else if(img.x>=rc4.x&&img.x<=(rc4.x+rc4.width)&&img.y>=rc4y&&img.y<=(rc4y+rc4.height))
 					{
-						moteAreaMap[e]=4;
+						moteAreaMap[e]=3;
 						//	trace("区域对应"+img.id+":"+moteAreaMap[e]);
 					}
 					else
@@ -658,17 +660,25 @@
             <s:Image smooth="true"  source="@Embed('assets/unlock.png')" id="unlock" click="UnLock_Handle()" visible="false" includeInLayout="false"/>
 		</s:HGroup>
 	</s:actionContent>
-	 <s:VGroup height="100%" width="100%" >
-		 <s:HGroup height="50%" width="100%">
+	 <s:VGroup height="{Capabilities.screenResolutionY}" width="{Capabilities.screenResolutionX}">
+		 <s:HGroup height="43%" width="100%">
+		 
 			 <s:Group id="rc1" height="100%" width="50%" >
+				 <s:Label text="1区" backgroundAlpha="0"/>
 				 <s:Rect height="100%" width="100%"   >    
 					 <s:stroke>
 						 <s:SolidColorStroke color="0x000000" weight="2"/>
 					 </s:stroke>
+					 <s:fill >
+						 <!--s:BitmapFill fillMode="scale" source="@Embed('assets/grass1.jpg')" smooth="true"/-->
+						 <s:BitmapFill fillMode="scale" source="@Embed('assets/grass1.png')" smooth="true"/>
+					 </s:fill>
 				 </s:Rect>
+				
 			 </s:Group>
 			
 			 <s:Group id="rc2" height="100%" width="50%">
+				 <s:Label text="2区" backgroundAlpha="0"/>
 				 <s:Rect height="100%" width="100%">    
 					 <s:stroke>
 						 <s:SolidColorStroke color="0x000000" weight="2"/>
@@ -678,6 +688,7 @@
 		 </s:HGroup>
 		 <s:HGroup height="50%" width="100%">
 			 <s:Group id="rc3" height="100%" width="50%">
+				 <s:Label text="4区" backgroundAlpha="0"/>
 				 <s:Rect height="100%" width="100%">    
 					 <s:stroke>
 						 <s:SolidColorStroke color="0x000000" weight="2"/>
@@ -685,6 +696,7 @@
 				 </s:Rect>
 			 </s:Group>
 			 <s:Group id="rc4" height="100%" width="50%" >
+				 <s:Label text="3区" backgroundAlpha="0"/>
 				 <s:Rect height="100%" width="100%">    
 					 <s:stroke>
 						 <s:SolidColorStroke color="0x000000" weight="2"/>

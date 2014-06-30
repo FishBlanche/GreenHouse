@@ -96,7 +96,7 @@
 			private  function create():void{
 				uname.addEventListener(FlexEvent.ENTER,enter_submit);
 				upass.addEventListener(FlexEvent.ENTER,enter_submit);
-				cameraIp.addEventListener(FlexEvent.ENTER,cameraIp_submit);
+				 
 				var persistencemanager:PersistenceManager=new PersistenceManager();
 				if(persistencemanager.load())
 				{
@@ -108,10 +108,7 @@
 					{
 						upass.text=persistencemanager.getProperty("upword").toString();
 					}
-					if(persistencemanager.getProperty("cameraIp"))
-					{
-						cameraIp.text=persistencemanager.getProperty("cameraIp").toString();
-					}
+					 
 				}
 			}
 			private function enter_submit(event:FlexEvent):void{
@@ -143,26 +140,7 @@
 					}
 				}
 			}
-			private function cameraIp_submit(event:FlexEvent):void{
-				lmessage.text="";
-				if(ipReg.test(cameraIp.text))
-				{
-					var persistencemanager:PersistenceManager=new PersistenceManager();
-					if(persistencemanager.load())
-					{
-						persistencemanager.setProperty("cameraIp",cameraIp.text);
-						persistencemanager.save();
-						isCamera=false;
-						var ipStr:String="http://"+cameraIp.text;
-						var url:URLRequest = new URLRequest(ipStr);
-						navigateToURL(url, "_blank");
-					}
-				}
-				else
-				{
-					lmessage.text="IP地址格式错误";
-				}
-			}
+		 
 			private  function AutoControl_handler(e:ResultEvent):void{
 				lmessage.text="";
 				if(e.result=="")
@@ -217,7 +195,7 @@
 					autovg.removeElement(rgDel);
 					for(var i:int=0;i<gpCollect.length;i++)
 					{
-						if(gpCollect.getItemAt(i).gpId==rgDel.rulebtn.label)
+						if(gpCollect.getItemAt(i).gpId==rgDel.rulebtn.name)
 						{
 							gpCollect.removeItemAt(i);
 							break;
@@ -472,7 +450,8 @@
 					var rgp:MyRuleGroup=new MyRuleGroup;
 					rgp.width=this.width*0.8;
 					rgp.height=this.height*0.1;
-					rgp.rulebtn.label=gpCollect.getItemAt(i).gpId;
+					rgp.rulebtn.name=gpCollect.getItemAt(i).gpId;
+					rgp.rulebtn.label="点击查看";
 					rgp.rulebtn.addEventListener(MouseEvent.CLICK,look_Handle);
 					rgp.myTime.text = valueArr[2]; 
 					rgp.myRuleDel.addEventListener(MouseEvent.CLICK,RuleDel_Handle);
@@ -493,7 +472,7 @@
 				var delgp:String="";
 				for(var i:int=0;i<gpCollect.length;i++)
 				{
-					if(gpCollect.getItemAt(i).gpId==rgDel.rulebtn.label)
+					if(gpCollect.getItemAt(i).gpId==rgDel.rulebtn.name)
 					{
 						//gpCollect.removeItemAt(i);
 						delgp=gpCollect.getItemAt(i).gpId+";"+gpCollect.getItemAt(i).gpValue;
@@ -588,7 +567,7 @@
 					var lookArr:Array;
 					for(var i:int=0;i<gpCollect.length;i++)
 					{
-						if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.label)
+						if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.name)
 						{
 							lookgp=String(gpCollect.getItemAt(i).gpValue).split(";");
 							lookStr=lookgp[0];
@@ -713,7 +692,7 @@
 					var ruleArr:Array;
 					for(var i:int=0;i<gpCollect.length;i++)
 					{
-						if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.label)
+						if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.name)
 						{
 							lookgp=String(gpCollect.getItemAt(i).gpValue).split(";");
 							rulegp=String(lookgp[1]).split("a");
@@ -840,7 +819,7 @@
 				 {
 					 for(var i:int=0;i<gpCollect.length;i++)
 					 {
-						 if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.label)
+						 if(gpCollect.getItemAt(i).gpId==rgLook.rulebtn.name)
 						 {
 							 gpStr=gpCollect.getItemAt(i).gpId+";";
 						 }
@@ -1171,18 +1150,14 @@
 			<s:Label fontSize="25" text="密码" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
 			<s:TextInput styleName="itextInput" displayAsPassword="true" color="haloblue" horizontalCenter="0"   verticalCenter="0" width="30%"    height="80%"  id="upass"  prompt="密码"  skinClass="spark.skins.mobile.TextInputSkin" />
 		</s:HGroup>
-		<s:HGroup includeInLayout="{isCamera}" visible="{isCamera}"  horizontalAlign="center" width="100%" height="100%" verticalCenter="0" verticalAlign="middle">
-			<s:Label  text="摄像机IP" fontSize="25"  horizontalCenter="0" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
-			<s:TextInput styleName="itextInput" color="haloblue" verticalCenter="0" width="60%"    height="80%"  id="cameraIp"  prompt="摄像机IP"  skinClass="spark.skins.mobile.TextInputSkin" />
-		</s:HGroup>
+		 
 	</s:navigationContent>
 	<s:titleContent>
 		<s:Label   fontSize="15"  id="lmessage" color="#F00000" />
 	</s:titleContent>
 	<s:actionContent>
 		<s:Image smooth="true" source="@Embed('assets/loginIcon.png')" enabled="{!isCamera}" click="show_LoginWindow()" right="2"/>
-		<s:Spacer width="10"/>
-		<s:Image smooth="true" source="@Embed('assets/shexiang.png')" enabled="{!isLogin}" click="show_Camera()" right="2"/>
+	 
 	</s:actionContent>
 	<s:Scroller      id="scrllr1"      width="{this.width}" height="{this.height}">
 		<s:VGroup  id="vg1" width="{this.width}" height="{this.height}" horizontalAlign="center" verticalAlign="middle">
@@ -1225,9 +1200,9 @@
 					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
 						
 						<s:ToggleButton id="fan1" color="white" width="45%" selected="false" click="fan1.selected = true;fan2.selected=false;"
-										label="1" skinClass="skins.LeftButtonSkin" />
+										label="西" skinClass="skins.LeftButtonSkin" />
 						<s:ToggleButton id="fan2" color="white" width="45%" selected="false" click="fan2.selected = true;fan1.selected=false;"
-										label="2" skinClass="skins.RightButtonSkin" />
+										label="东" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
 					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
 						
@@ -1296,22 +1271,36 @@
 		</s:VGroup>
 </s:Scroller>
 <s:Scroller top="2"  includeIn="condition"    id="scrllr"      width="{this.width}" height="{this.height}">
-	<s:VGroup top="5"  id="vg" width="{this.width}" height="{this.height}" horizontalAlign="center" >
+	<s:VGroup top="5"  gap="0"  id="vg" width="{this.width}" height="{this.height}" horizontalAlign="center" >
 		<s:HGroup top="2" width="100%" horizontalAlign="center">
 			<s:Image verticalAlign="middle" horizontalAlign="center"  id="leftdot2" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
 			<s:Label verticalAlign="middle" horizontalCenter="0"  text="条件设置" color="green" fontWeight="bold" fontSize="25"/>
 			<s:Image verticalAlign="middle"  horizontalAlign="center" id="rightdot2" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
 		</s:HGroup>
-		<s:HGroup width="{this.width}" height="{this.height*0.15}" horizontalAlign="center" verticalAlign="middle">
-			<s:Image   id="tem" source="{icon_T}" width="80" height="48"  click="TypeChange(1,event)" alpha="0.4"  smooth="true"/>
-			<s:Image  id="hum" source="{icon_H}" width="80"  height="48" click="TypeChange(2,event)" alpha="0.4"  smooth="true"/>
-			<s:Image id="stemp" source="{icon_ST}" width="80" height="48"  click="TypeChange(3,event)" alpha="0.4" smooth="true"/>
-			<s:Image id="shum"  source="{icon_SH}" width="80"  height="48" click="TypeChange(4,event)" alpha="0.4"  smooth="true"/>
-			<s:Image id="l" source="{icon_L}" width="80"   height="48" click="TypeChange(5,event)" alpha="0.4"  smooth="true"/>
-			<s:Image id="ph" source="{icon_PH}" width="80"  height="48" click="TypeChange(6,event)" alpha="0.4"  smooth="true"/>
-			<s:Image id="co" source="{icon_CO}" width="80"   height="48" click="TypeChange(7,event)" alpha="0.4" smooth="true"/>
-			<s:Image id="co2" source="{icon_CO2}" width="80"   height="48" click="TypeChange(8,event)" alpha="0.4" smooth="true"/>
-		</s:HGroup>
+	 <s:VGroup horizontalAlign="center">
+		 <s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
+			 <s:Image   id="tem" source="{icon_T}" width="80" height="48"  click="TypeChange(1,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image  id="hum" source="{icon_H}" width="80"  height="48" click="TypeChange(2,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="stemp" source="{icon_ST}" width="80" height="48"  click="TypeChange(3,event)" alpha="0.4" smooth="true"/>
+			 <s:Image id="shum"  source="{icon_SH}" width="80"  height="48" click="TypeChange(4,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="l" source="{icon_L}" width="80"   height="48" click="TypeChange(5,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="ph" source="{icon_PH}" width="80"  height="48" click="TypeChange(6,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="co" source="{icon_CO}" width="80"   height="48" click="TypeChange(7,event)" alpha="0.4" smooth="true"/>
+			 <s:Image id="co2" source="{icon_CO2}" width="80"   height="48" click="TypeChange(8,event)" alpha="0.4" smooth="true"/>
+		 </s:HGroup>
+		 <s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
+			 <s:Label    id="temLabel"    text="温度" textAlign="center" width="80"   backgroundAlpha="0" color="#1d953f"/>
+			 <s:Label  id="humLabel"  text="湿度" textAlign="center" width="80"    backgroundAlpha="0" color="#1d953f"/>
+			 <s:Label  id="stempLabel"  text="土壤温度"  textAlign="center"  width="80"  backgroundAlpha="0" color="#1d953f"/>
+			 <s:Label  id="shumLabel"   text="土壤湿度"  textAlign="center" width="80"  backgroundAlpha="0" color="#1d953f"/>
+			 <s:Label  id="lLabel"  text="光照"  textAlign="center"  width="80"  backgroundAlpha="0" color="#1d953f"/>
+			 <s:Label  id="phLabel"   text="ph"  textAlign="center"  width="80" backgroundAlpha="0" color="#1d953f"/>
+			 <s:Label  id="coLabel"  text="co"   textAlign="center" width="80"  backgroundAlpha="0" color="#1d953f"/>
+			 <s:Label  id="co2Label" text="co2"  textAlign="center" width="80"    backgroundAlpha="0" color="#1d953f"/>
+		 </s:HGroup>
+	 </s:VGroup>
+		
+	  
 		<s:HGroup    horizontalAlign="center">
 			<s:Image verticalAlign="middle" horizontalAlign="center"  id="before1"   click="DelConditionAndControl();AutoView()"   source="assets/before.png" width="80" height="48"   smooth="true"/>
 			<s:Image verticalAlign="middle"  horizontalAlign="center" id="after1" enabled="false" click="deviceView()" source="assets/after.png" width="80" height="48"   smooth="true"/>
@@ -1324,12 +1313,23 @@
 			<s:Label verticalAlign="middle" horizontalCenter="0"  text="操作设置" color="green" fontWeight="bold" fontSize="25"/>
 			<s:Image verticalAlign="middle"  horizontalAlign="center" id="rightdot3" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
 		</s:HGroup>
-		<s:HGroup width="{this.width}" height="{this.height*0.15}" horizontalAlign="center" verticalAlign="middle">
+	<s:VGroup horizontalAlign="center">
+		<s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
 			<s:Image click="mdgImg_Handle(event)"   id="myRoller" source="assets/roller.png" width="80" height="48"  alpha="0.4"  smooth="true"/>
 			<s:Image click="mdgImg_Handle(event)" id="myFan" source="assets/fan.png" width="80"  height="48"  alpha="0.4"  smooth="true"/>
 			<s:Image click="mdgImg_Handle(event)" id="myHumi" source="assets/humidifier.png" width="80" height="48"  alpha="0.4"  smooth="true"/>
 			<s:Image click="mdgImg_Handle(event)" id="myIrri"  source="assets/water.png" width="80"  height="48"  alpha="0.4"  smooth="true"/>
 		</s:HGroup>
+		<s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
+			<s:Label    id="RollerLabel"    text="卷帘" textAlign="center" width="80"   backgroundAlpha="0" color="#1d953f"/>
+			<s:Label  id="FanLabel"  text="风扇" textAlign="center" width="80"    backgroundAlpha="0" color="#1d953f"/>
+			<s:Label  id="HumiLabel"  text="加湿器"  textAlign="center"  width="80"  backgroundAlpha="0" color="#1d953f"/>
+			<s:Label  id="IrriLabel"   text="灌溉"  textAlign="center" width="80"  backgroundAlpha="0" color="#1d953f"/>
+			
+		</s:HGroup>
+		</s:VGroup>
+		
+		
 		<s:HGroup    horizontalAlign="center">
 			<s:Image verticalAlign="middle" horizontalAlign="center"  id="before2" click="before2Click()"   source="assets/before.png" width="80" height="48"   smooth="true"/>
 			<s:Button id="mySetting" click="MySet()"  skinClass="skins.CustomizeButtonSkin" color="white" enabled="false"      label="{setType}"  width="100" height="48"  fontSize="25"/>

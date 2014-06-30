@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"   backgroundAlpha="0.3" initialize="init()" creationComplete="create()">
+		xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/mx"  xmlns:charts="charts.*"  backgroundAlpha="0.3" initialize="init()" creationComplete="create()">
 	<fx:Declarations>
 		<mx:SeriesSlide  id="slide" direction="right"  duration="200"   />
 		<mx:SolidColorStroke id="chartStroke" color="black" weight="1" alpha="0.7"/>
@@ -15,6 +15,8 @@
 		<mx:SolidColorStroke id = "s8" color="#f47920" weight="0.6"/>
 		 
 		<mx:SolidColor id="circleFill" color="#f47920" alpha="1"/>
+		<s:DateTimeFormatter id="df" dateTimePattern="MM/dd HH:mm"/>
+		<charts:JackAxisArrayList id="hAxisData"/>
 	</fx:Declarations>
 	<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
@@ -22,24 +24,62 @@
 		{
 			fontSize:13;
 		}
+		.itextInput
+		{
+			skinClass:ClassReference("spark.skins.mobile.TextInputSkin");
+			showPromptWhenFocused: false;
+			borderVisible:false;
+		}
+		.issueTimelineHolder
+		{
+			background-color:#787878;
+		}
+		.issueTimelineChart
+		{
+			padding-top:5px;
+			padding-right:0;
+			padding-bottom:0;
+			padding-left:0;    
+		}
+		.timelineDateAxis
+		{
+			color:#F00000;
+		}
+		
+		
 	</fx:Style>
 	<fx:Script>
 		<![CDATA[
-		    import mx.collections.ArrayCollection;
+			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
 			import mx.messaging.ChannelSet;
 			import mx.messaging.channels.AMFChannel;
 			import mx.rpc.events.FaultEvent;
 			import mx.rpc.events.ResultEvent;
 			import mx.rpc.remoting.RemoteObject;
+			import mx.utils.StringUtil;
 			
+			import spark.components.Group;
 			import spark.components.Image;
 			import spark.managers.PersistenceManager;
+			import spark.skins.mobile.TextInputSkin;
 			import spark.transitions.SlideViewTransition;
 			
-			import components.BigFontLegendItem;
+			import charts.PortfolioChart;
+			
+			 
 			
 			import model.ParaInfo;
+			private var Tchart:PortfolioChart;
+			private var Hchart:PortfolioChart;
+			private var STchart:PortfolioChart;
+			private var SHchart:PortfolioChart;
+			private var COchart:PortfolioChart;
+			private var PHchart:PortfolioChart;
+			private var CO2chart:PortfolioChart;
+			private var Lchart:PortfolioChart;
+			
 			private	var slideTrans:SlideViewTransition=new SlideViewTransition;
 			private var myAMF:AMFChannel=new AMFChannel;
 			private var channelSet:ChannelSet=new ChannelSet;
@@ -53,14 +93,17 @@
 			private	 var phInfo:ArrayCollection  = new ArrayCollection;  //第一层树结点数据
 			private	 var co2Info:ArrayCollection  = new ArrayCollection;  //第一层树结点数据
 			private	 var lInfo:ArrayCollection  = new ArrayCollection;  //第一层树结点数据
+			private	var TH_ID:String="";
+			private	var STH_ID:String="";
+			private	var CO_ID:String="";
+			private	var PH_ID:String="";
+			private	var CO2_ID:String="";
+			private	var L_ID:String="";
+			 
+			private var numReg:RegExp =/^[0-9]*[1-9][0-9]*$/;
 			private function init():void
 			{
-				 var TH_ID:String="";
-				 var STH_ID:String="";
-				 var CO_ID:String="";
-				 var PH_ID:String="";
-				 var CO2_ID:String="";
-				 var L_ID:String="";
+				
 				 slideTrans.direction="right";
 				moteMap=data as Dictionary;
 				for(var e:Object in moteMap){ 
@@ -92,13 +135,15 @@
 					if(persistencemanager.getProperty("serverAddress"))
 					{
 						myAMF.url=persistencemanager.getProperty("serverAddress").toString();
-						
+				  
 						channelSet.addChannel(myAMF); 
 						ro.channelSet = channelSet;
 						ro.destination="FindLastSense";
 						ro.addEventListener(ResultEvent.RESULT,result_Handle);
 						ro.addEventListener(FaultEvent.FAULT,faultHandle);
-						ro.GetLastSense(TH_ID,STH_ID,CO_ID,PH_ID,CO2_ID,L_ID);
+						ro.newGetLastSense(TH_ID,STH_ID,CO_ID,PH_ID,CO2_ID,L_ID,1);//select the last five days' data
+						 
+				//		trace("ro"+ro.requestTimeout);
 						FlexGlobals.topLevelApplication.GlobalBusy=false;
 					}
 					else
@@ -110,15 +155,76 @@
 			
 			private function create():void
 			{
+				myday.addEventListener(FlexEvent.ENTER,enter_submit);
+			 
+				Tchart = new PortfolioChart();
+				Tchart.itemSelected=1;
+				Tchart.height=this.height*0.25;
+				PC.addElement(Tchart);
 				 
+				
+				Hchart = new PortfolioChart();
+				Hchart.itemSelected=2;
+				Hchart.height=this.height*0.25;
+				PC.addElement(Hchart);
+				 
+				
+				
+				STchart = new PortfolioChart();
+				STchart.itemSelected=3;
+				STchart.height=this.height*0.25;
+				PC.addElement(STchart);
+				 
+				
+				SHchart = new PortfolioChart();
+				SHchart.itemSelected=4;
+				SHchart.height=this.height*0.25;
+				PC.addElement(SHchart);
+				 
+				
+				COchart = new PortfolioChart();
+				COchart.itemSelected=5;
+				COchart.height=this.height*0.25;
+				PC.addElement(COchart);
+				 
+				PHchart = new PortfolioChart();
+				PHchart.itemSelected=6;
+				PHchart.height=this.height*0.25;
+				PC.addElement(PHchart);
+				 
+				
+				CO2chart = new PortfolioChart();
+				CO2chart.itemSelected=7;
+				CO2chart.height=this.height*0.25;
+				PC.addElement(CO2chart);
+			 
+				Lchart = new PortfolioChart();
+				Lchart.itemSelected=8;
+				Lchart.height=this.height*0.25;
+				PC.addElement(Lchart);  
+				var fillgp:Group=new Group;
+				fillgp.height=40;
+				PC.addElement(fillgp); 
+				
+			}
+			protected function zoom(e:TransformGestureEvent):void
+			{ 
+				 
+			}
+			protected function fingerOut(event:Event):void
+			{
+				
+			 
 			}
 			private  function  faultHandle(event:FaultEvent):void
 			{ 
-				trace(" request error");
+				trace("faultHandle(event:FaultEvent) request error");
 				trace(event.fault.faultString);
 				trace(event.fault.faultDetail);
 			}
 			private function result_Handle(event:ResultEvent):void{
+			 
+				
 				tempInfo.removeAll();
 				humiInfo.removeAll();
 				stempInfo.removeAll();
@@ -132,146 +238,106 @@
 					 switch(i)
 					 {
 						 case 1:tempInfo=event.result[e] as ArrayCollection;
-							   templs.dataProvider=tempInfo;
-							  
-							   trace("tempInfo"+tempInfo.length);
+							    Tchart.data=set_data(tempInfo);
 							     break;
 						 case 2:humiInfo=event.result[e] as ArrayCollection;
-							    humils.dataProvider=humiInfo;
-								trace("humiInfo"+humiInfo.length);
+							   Hchart.data=set_data(humiInfo);
 							    break;
 						 case 3:stempInfo=event.result[e] as ArrayCollection;
-							 stempls.dataProvider=stempInfo;
-							 trace("stempInfo"+stempInfo.length);
+							     STchart.data= set_data(stempInfo);
 							    break;
 						 case 4:shumiInfo=event.result[e] as ArrayCollection;
-							  shumils.dataProvider=shumiInfo;
-							  trace("shumiInfo"+shumiInfo.length);
+							    SHchart.data=  set_data(shumiInfo);
 							    break;
 						 case 5:coInfo=event.result[e] as ArrayCollection;
-							 //trace("coInfo"+coInfo.length);
-							 COls.dataProvider=coInfo;
-							 
-							  trace("coInfo"+coInfo.length);
+							    COchart.data=set_data(coInfo);
 							   break;
 						 case 6:phInfo=event.result[e] as ArrayCollection;
-							     PHls.dataProvider=phInfo;
-								 trace("phInfo"+phInfo.length);
+							      PHchart.data=set_data(phInfo);
 							    break;
 						 case 7:co2Info=event.result[e] as ArrayCollection;
-							 CO2ls.dataProvider=co2Info;
-							 trace("co2Info"+co2Info.length);
-							    break;
+							     CO2chart.data=set_data(co2Info);
+							      break;
 						 case 8:lInfo=event.result[e] as ArrayCollection;
-							// Lls.dataProvider=lInfo;
-							 Lls.dataProvider=lInfo;
-							 trace("Lls"+lInfo.length);
+							    Lchart.data=set_data(lInfo);
 							    break;
 						 default:trace("一天数据出错！！！");
 					 }
 					 i++;
 				}
+				historyShowBtn.includeInLayout=true;
+				historyShowBtn.visible=true;
+				busy.includeInLayout=false;
+				busy.visible=false; 
+			}
+			private function set_data(ac:ArrayCollection):Array{
+				var tempArr:Array;
+				var takenum:int=Math.floor(ac.length/1500);
+				var removenum:int=0;
+				if(takenum>1){
+					for(var i:int=0;i<ac.length;)
+					{
+						for(var j:int=1;j<takenum&&(i+1)<ac.length;j++)
+						{
+							ac.removeItemAt(i+1);
+							removenum++;
+						}
+						i=i+1;
+					}
+					ac.refresh();
+				}
+				tempArr=ac.toArray();
+				return tempArr;
+			}
+			private function enter_submit(event:FlexEvent):void{
+				stage.focus=null;
+				search_click();
+			}
+		 
+		
+			private function search_click():void{
+				if(numReg.test(StringUtil.trim(myday.text)))
+				{
+					//trace("yes");
+					historyShowBtn.includeInLayout=false;
+					historyShowBtn.visible=false;
+					busy.includeInLayout=true;
+					busy.visible=true;
+					ro.newGetLastSense(TH_ID,STH_ID,CO_ID,PH_ID,CO2_ID,L_ID,int(StringUtil.trim(myday.text)));//select the last five days' data
+				}
+				else
+				{
+				//	trace("no");
+					myday.text="请输入正整数!";
+					 
+				}
+				
 			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>
 		<s:Button icon="@Embed('assets/back.png')" click="navigator.popView()"  height="55"/>
+		<!--s:Spacer width="8"/-->
+		
 	</s:navigationContent>
-	 
+	 <s:titleContent>
+		 <s:Label text="区域{FlexGlobals.topLevelApplication.selectedArea}历史趋势" color="halogreen"   verticalAlign="middle" backgroundAlpha="0" height="55" horizontalCenter="0" fontSize="25"  />
+		 <s:Spacer width="12"/>
+		 <s:HGroup verticalAlign="middle">
+			 <s:TextInput styleName="itextInput"  color="#130c0e"          id="myday"  prompt="输入查看天数"  skinClass="spark.skins.mobile.TextInputSkin" />
+ 			 <s:Label text="天" color="halogreen"   verticalAlign="middle" backgroundAlpha="0"   fontSize="25"  />
+			 <s:Image id="historyShowBtn"  click="search_click()" width="48" height="48" source="assets/searchHis.png" />
+			 <s:BusyIndicator id="busy" width="48" height="48" visible="false" includeInLayout="false"    symbolColor="haloblue" />
+		 </s:HGroup>
+	 </s:titleContent>
 	<s:actionContent>
-		<s:Label text="区域{FlexGlobals.topLevelApplication.selectedArea}" color="halogreen"   verticalAlign="middle" backgroundAlpha="0" height="55" horizontalCenter="0" fontSize="25"  />
 	</s:actionContent>
-	<s:VGroup width="98%"  height="100%" horizontalAlign="center" verticalAlign="middle">
-		<mx:ColumnChart   color="black" fontSize="18" id="lineChart1" 	height="33%" width="100%" 	paddingLeft="5" paddingRight="5" 	showDataTips="true"  >        
-		 
-			<mx:verticalAxis>
-				<mx:LinearAxis  baseAtZero="true" id="la1"/>
-			</mx:verticalAxis>
-			<mx:series>
-				 <mx:LineSeries  id="templs"       fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="温度(°C)"  lineStroke="{s1}">
-					 <mx:horizontalAxis>
-						 <mx:CategoryAxis displayName="时间"      id="ca11" categoryField="timestamparrive_tm"/>
-					 </mx:horizontalAxis>
-				 </mx:LineSeries>
-				<mx:LineSeries  id="humils"     fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="湿度(%RH)"  lineStroke="{s2}">
-					<mx:horizontalAxis>
-						<mx:CategoryAxis displayName="时间"      id="ca12" categoryField="timestamparrive_tm"/>
-					</mx:horizontalAxis>
-				</mx:LineSeries>
-				<mx:LineSeries  id="stempls"     fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="土壤温度(°C)"  lineStroke="{s3}">
-					<mx:horizontalAxis>
-						<mx:CategoryAxis displayName="时间"      id="ca13" categoryField="timestamparrive_tm"/>
-					</mx:horizontalAxis>
-				</mx:LineSeries>
-				<mx:LineSeries  id="shumils"    fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="土壤湿度(%RH)"  lineStroke="{s4}">
-					<mx:horizontalAxis>
-						<mx:CategoryAxis displayName="时间"      id="ca14" categoryField="timestamparrive_tm"/>
-					</mx:horizontalAxis>
-				</mx:LineSeries>
-			</mx:series>
-			<mx:horizontalAxisRenderers>
-				 <mx:AxisRenderer     placement="bottom" canDropLabels="true"    axis="{ca11}"  axisStroke="{chartStroke}"  tickStroke="{chartStroke}"/>
-				 
-			</mx:horizontalAxisRenderers>
-			<mx:verticalAxisRenderers>
-				<mx:AxisRenderer placement="left"  axis="{la1}"  axisStroke="{chartStroke}"  tickStroke="{chartStroke}"/>
-			</mx:verticalAxisRenderers>
-		</mx:ColumnChart>
-		<mx:Legend legendItemClass="components.BigFontLegendItem"   direction="horizontal" color="black" fontSize="20" dataProvider="{lineChart1}"/>
-		<mx:ColumnChart   color="black" fontSize="18" id="lineChart2" 	height="33%" width="100%" 	paddingLeft="5" paddingRight="5" 	showDataTips="true"  >        
+<s:Scroller top="20"  color="haloblue"    id="scrllr"      width="{this.width}" height="{this.height}" >
+	 
+		<s:VGroup top="20" gap="{this.height*0.1}"   styleName="issueTimelineHolder" width="100%" height="100%" id="PC"  >
 			
-			<mx:verticalAxis>
-				<mx:LinearAxis  baseAtZero="true" id="la2"/>
-			</mx:verticalAxis>
-			<mx:series>
-				
-				<mx:LineSeries  id="COls"    fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="CO(ppm)"  lineStroke="{s5}">
-					<mx:horizontalAxis>
-						<mx:CategoryAxis displayName="时间"       id="ca21" categoryField="timestamparrive_tm"/>
-					</mx:horizontalAxis>
-				</mx:LineSeries>
-				<mx:LineSeries  id="PHls"   fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="PH"  lineStroke="{s6}">
-					<mx:horizontalAxis>
-						<mx:CategoryAxis displayName="时间"       id="ca22" categoryField="timestamparrive_tm"/>
-					</mx:horizontalAxis>
-				</mx:LineSeries>
-				 
-			</mx:series>
-			<mx:horizontalAxisRenderers>
-				<mx:AxisRenderer     placement="bottom" canDropLabels="true"    axis="{ca21}"  axisStroke="{chartStroke}"  tickStroke="{chartStroke}"/>
-				 
-			</mx:horizontalAxisRenderers>
-			<mx:verticalAxisRenderers>
-				<mx:AxisRenderer placement="left"  axis="{la2}"  axisStroke="{chartStroke}"  tickStroke="{chartStroke}"/>
-			</mx:verticalAxisRenderers>
-		</mx:ColumnChart>
-		<mx:Legend legendItemClass="components.BigFontLegendItem"   direction="horizontal" color="black" fontSize="20" dataProvider="{lineChart2}"/>
-		<mx:ColumnChart   color="black" fontSize="18" id="lineChart3" 	height="33%" width="100%" 	paddingLeft="5" paddingRight="5" 	showDataTips="true"  >        
-			
-			<mx:verticalAxis>
-				<mx:LinearAxis  baseAtZero="true" id="la3"/>
-			</mx:verticalAxis>
-			<mx:series>
-				<mx:LineSeries  id="CO2ls"    fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="CO2(ppm)"  lineStroke="{s7}">
-					<mx:horizontalAxis>
-						<mx:CategoryAxis displayName="时间"      id="ca31" categoryField="timestamparrive_tm"/>
-					</mx:horizontalAxis>
-				</mx:LineSeries>
-				<mx:LineSeries  id="Lls"   fill="{circleFill}"    filters="[]" radius="2"    xField="timestamparrive_tm" yField="value" displayName="光照(lux)"  lineStroke="{s8}">
-					<mx:horizontalAxis>
-						<mx:CategoryAxis displayName="时间"      id="ca32" categoryField="timestamparrive_tm"/>
-					</mx:horizontalAxis>
-				</mx:LineSeries>
-				
-			</mx:series>
-			<mx:horizontalAxisRenderers>
-				<mx:AxisRenderer     placement="bottom"  canDropLabels="true"   axis="{ca31}"  axisStroke="{chartStroke}"  tickStroke="{chartStroke}"/>
-			</mx:horizontalAxisRenderers>
-			<mx:verticalAxisRenderers>
-				<mx:AxisRenderer placement="left"  axis="{la3}"  axisStroke="{chartStroke}"  tickStroke="{chartStroke}"/>
-			</mx:verticalAxisRenderers>
-		</mx:ColumnChart>
-		<mx:Legend legendItemClass="components.BigFontLegendItem"   direction="horizontal" color="black" fontSize="20" dataProvider="{lineChart3}"/>
-	</s:VGroup>
+		</s:VGroup>
+ 
+</s:Scroller >
 	
 </s:View>

@@ -3,10 +3,8 @@
 <s:TabbedViewNavigatorApplication xmlns:fx="http://ns.adobe.com/mxml/2009"
 								  xmlns:s="library://ns.adobe.com/flex/spark"
 								  xmlns:controller="controller.*"
-								  xmlns:components="components.*"
-								  splashScreenImage="components.MyScreenImageSource"
-								  splashScreenMinimumDisplayTime="2000"
-								  splashScreenScaleMode="stretch" initialize="init()" creationComplete="create()" xmlns:mx="library://ns.adobe.com/flex/mx" >
+								  xmlns:components="components.*"  preloader="components.Loading"
+								   initialize="init()" creationComplete="create()" xmlns:mx="library://ns.adobe.com/flex/mx" applicationComplete="fullScreen()">
 	
 	<fx:Declarations>
 		<!--controller:SensingFeed id="feed"/-->
@@ -15,7 +13,7 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
-			
+			//splashScreenImage="components.MyScreenImageSource"	splashScreenMinimumDisplayTime="300" splashScreenScaleMode="stretch"
 
 			[Bindable]
 			public var  GlobalBusy:Boolean = true;	
@@ -33,6 +31,16 @@
 				
 			
 			}
+			private function fullScreen():void{
+				
+				//全屏
+				//stage.displayState = StageDisplayState.FULL_SCREEN; 
+				//取消底边
+				trace("fullScreen()");
+				stage.stageWidth=Capabilities.screenResolutionX;   
+				stage.stageHeight= Capabilities.screenResolutionY;  
+				
+			}
 			
 		]]>
 	</fx:Script>
@@ -41,6 +49,6 @@
 					 firstView="views.GreenHouseView"
 					 icon="@Embed('assets/live.png')" />
 	
-	<s:ViewNavigator width="100%" height="100%"   color="halogreen"  label="控制"  firstView="views.MyControlView" icon="@Embed('assets/man.png')"/>
-	<s:ViewNavigator width="100%" height="100%"   color="halogreen"  label="摄像"  firstView="views.CameraView" icon="@Embed('assets/camera.png')"/>
+	<s:ViewNavigator width="100%" height="100%"   color="halogreen"  label="控制"  firstView="views.MyControlView" icon="@Embed('assets/controller.png')"/>
+	<!--s:ViewNavigator width="100%" height="100%"   color="halogreen"  label="摄像"  firstView="views.CameraView" icon="@Embed('assets/camera.png')"/-->
 </s:TabbedViewNavigatorApplication>
