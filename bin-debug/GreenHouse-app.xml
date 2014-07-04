@@ -115,13 +115,15 @@
 	<autoOrients>false</autoOrients>
 	<aspectRatio>portrait</aspectRatio>
         <fullScreen>true</fullScreen>
-        <x>0</x>
-        <y>0</y>
+        <x>20</x>
+        <y>20</y>
         <visible>true</visible>
-       
-       <resizable>false</resizable>
-       <minimizable>true</minimizable>
-       <maximizable>false</maximizable>
+        <resizable>true</resizable>
+        <minSize>1024 768</minSize>
+       <systemChrome>none</systemChrome>
+
+ 
+        
         <softKeyboardBehavior>none</softKeyboardBehavior>
         
     </initialWindow>

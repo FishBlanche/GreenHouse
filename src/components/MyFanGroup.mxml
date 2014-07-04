@@ -16,8 +16,8 @@
 	</fx:Declarations>
 	
 	<s:HGroup width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" >
-		<s:Image id="fan"  source="assets/fan.png" width="80" height="48"  smooth="true"/>
-		 <s:Label text="" height="100%" width="25%"/>
+		<s:Image id="fan"    width="85" height="53"  smooth="true"/>
+		 
 		<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="30%">
 			
 			<s:ToggleButton id="fanOn" color="white" width="45%" selected="false" click="fanOn.selected = true;fanOff.selected=false;"
@@ -27,9 +27,9 @@
 		</s:HGroup>
 		<s:Image id="ftime" source="assets/duration.png" width="80" height="48"  smooth="true"/>
 		<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="30%"    id="fSlider"  
-						 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+						 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
 		 
-		<s:Image   source="assets/delIcon.png" name="fDel" id="myDel"  width="80" height="48"  smooth="true"/>
+		<s:Image   source="assets/delIcon.png"  id="myDel"  width="80" height="48"  smooth="true"/>
 	</s:HGroup>
 	
 </s:Group>

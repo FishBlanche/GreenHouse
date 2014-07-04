@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" width="400" height="300" addedToStage="to_stage()"  >
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.messaging.ChannelSet;
+			import mx.messaging.channels.AMFChannel;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.remoting.RemoteObject;
+			import mx.utils.StringUtil;
+			
+			import spark.managers.PersistenceManager;
+			import spark.skins.mobile.TextInputSkin;
+			private var myAMF:AMFChannel=new AMFChannel();
+			private var channelSet:ChannelSet=new ChannelSet;
+			private var ro:RemoteObject = new RemoteObject();
+			private function to_stage():void
+			{
+				login_btn.includeInLayout=true;
+				login_btn.visible=true;
+				lmessage.includeInLayout=false;
+				lmessage.visible=false;
+				var persistencemanager:PersistenceManager=new PersistenceManager();
+				if(persistencemanager.load())
+				{
+					if(persistencemanager.getProperty("uname"))
+					{
+						uname.text=persistencemanager.getProperty("uname").toString();
+					}
+					if(persistencemanager.getProperty("upword"))
+					{
+						upass.text=persistencemanager.getProperty("upword").toString();
+					}
+					
+				}
+			}
+			private function enter_submit():void{
+				lmessage.includeInLayout=true;
+				lmessage.visible=true;
+				lmessage.text="正在验证----";
+				login_btn.includeInLayout=false;
+				login_btn.visible=false;
+				if(StringUtil.trim(uname.text)!=""&&StringUtil.trim(upass.text)!="")
+				{
+			    	var persistencemanager:PersistenceManager=new PersistenceManager();
+				    if(persistencemanager.load())
+				    {
+				      persistencemanager.setProperty("uname",uname.text);
+				      persistencemanager.setProperty("upword",upass.text);
+				      persistencemanager.save();
+				     if(persistencemanager.getProperty("serverAddress"))
+				     {
+				        myAMF.url=persistencemanager.getProperty("serverAddress").toString();
+				        channelSet.addChannel(myAMF); 
+				        ro.channelSet = channelSet;
+				        ro.destination="UserService";//验证用户身份
+				        ro.addEventListener(ResultEvent.RESULT,result_handler);
+				        ro.addEventListener(FaultEvent.FAULT,faultHandle);
+				        ro.queryUser(uname.text,upass.text);//请求服务端对用户的身份验证
+			         	}
+			      	else
+			        	{
+						lmessage.text="服务器未知";
+				        }
+					}
+				}
+				else
+				{
+					lmessage.text="信息不完整!";
+				}
+			}
+				private  function result_handler(e:ResultEvent):void{
+				 
+					FlexGlobals.topLevelApplication.currentUser="";
+					if(e.result!="")
+					{
+						var a:String=StringUtil.trim(e.result.toString());
+						FlexGlobals.topLevelApplication.currentUser=a;
+						lmessage.text="登录成功";
+						 trace("currentUser"+a);
+					}
+					else
+					{
+						lmessage.text="该用户不存在";
+					}
+					
+					 
+				}
+				private  function  faultHandle(event:FaultEvent):void
+				{ 
+					trace(" request error");
+					trace(event.fault.faultString);
+					trace(event.fault.faultDetail);
+				}
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="default" />
+		<s:State name="nodefaut" />
+		 
+	</s:states>
+	<s:BorderContainer width="100%" height="100%" horizontalCenter="0" verticalCenter="0">
+	<s:VGroup top="3" width="100%" height="100%" horizontalAlign="center" verticalAlign="middle">
+		<s:HGroup horizontalAlign="center" height="30%" width="100%">
+			<s:Label  verticalAlign="middle" textAlign="center" color="#999999" backgroundAlpha="0" text="用户名:" height="100%" fontFamily="微软雅黑" fontSize="15"  width="30%"/>
+			<s:TextInput includeIn="default" itemCreationPolicy="immediate" skinClass="spark.skins.mobile.TextInputSkin" color="#999999" verticalCenter="0"   id="uname"  width="70%" height="100%" fontFamily="微软雅黑" fontSize="15" borderVisible="false"/>
+		</s:HGroup>
+		<s:HGroup horizontalAlign="center" height="30%" width="100%">
+			<s:Label verticalAlign="middle" textAlign="center" color="#999999" backgroundAlpha="0" text="密码:" height="100%" width="30%" fontFamily="微软雅黑" fontSize="15"/>
+			<s:TextInput includeIn="default" itemCreationPolicy="immediate" skinClass="spark.skins.mobile.TextInputSkin" verticalCenter="0"   color="#999999" id="upass" height="100%" width="70%" fontFamily="微软雅黑" fontSize="15"  borderVisible="false"/>
+		</s:HGroup>
+		<s:HGroup horizontalAlign="center" height="40%" width="100%">
+			<s:Button  includeIn="default" itemCreationPolicy="immediate" click="enter_submit()" id="login_btn" color="#999999" label="登录" height="100%" width="100%" skinClass="skins.LoginBtnSkin" fontFamily="微软雅黑" fontSize="15"/>
+			<s:Label includeIn="default" itemCreationPolicy="immediate" visible="false"  includeInLayout="false" id="lmessage" color="#F00000" />
+		</s:HGroup>
+	</s:VGroup>
+	
+	</s:BorderContainer>
+	
+</s:Group>

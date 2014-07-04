@@ -15,14 +15,15 @@
 	</s:states>
 	<s:transitions>
 		<s:Transition>
-			<s:Fade target="{sc}" duration="500" />
+			 
+			<s:Move   targets="{rc,labelDisplay}" yBy="20" duration="600"/>
 		</s:Transition>
 	</s:transitions>
 	<!-- SkinParts
 	name=iconDisplay, type=spark.primitives.BitmapImage, required=false
 	name=labelDisplay, type=spark.core.IDisplayText, required=false
 	-->
-	 <s:Rect  radiusX="20" id="rc" top="0" left="0" right="0" bottom="0">
+	 <s:Rect  radiusX="5" id="rc" top="0" left="0" right="0" bottom="0">
 		 <s:fill>
 			 <s:SolidColor id="sc"  alpha.down="0.3" color="#1d953f"/>
 		 </s:fill>

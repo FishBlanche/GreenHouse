@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:fx="http://ns.adobe.com/mxml/2009"  xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:s="library://ns.adobe.com/flex/spark" width="100%" height="100%" borderAlpha="0">
+        <s:HGroup verticalAlign="middle"   left="10" height="10%" width="100%" horizontalAlign="center">
+			<s:Label   verticalAlign="middle"   color="#1b1b1b" fontFamily="微软雅黑"  id="area" fontSize="14" backgroundAlpha="0"/>
+			<s:Spacer width="100%"/>
+             <s:Image id="searchHis" source="assets/graysearch.png" height="100%" width="40" smooth="true"/>
+		</s:HGroup>
+		<s:VGroup top="46" left="80" gap="6"  width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" horizontalCenter="0">
+	
+		<s:HGroup   width="100%" height="12%"  verticalAlign="middle">
+			<s:Label  horizontalCenter="0"    color="#1b1b1b" fontFamily="微软雅黑" fontSize="14"   text="温度(℃):" width="30%" backgroundAlpha="0"/>
+			<mx:Box    width="70%" height="100%"   id="btemp" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label   height="100%" text="23" textAlign="right" width="100%"  color="#1b1b1b" id="temp" fontFamily="微软雅黑" fontSize="14"   verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+		<s:HGroup width="100%" height="12%" horizontalAlign="center" verticalAlign="middle">
+			<s:Label    color="#1b1b1b" fontFamily="微软雅黑" fontSize="14" horizontalCenter="0" text="湿度(%rh):" width="45%" backgroundAlpha="0"/>
+			<mx:Box      id="bhumi" width="55%" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label text="67" textAlign="right"   width="100%" color="#1b1b1b"  id="humi" fontFamily="微软雅黑" fontSize="14"    verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+		<s:HGroup width="100%" height="12%"   horizontalAlign="center" verticalAlign="middle">
+			<s:Label      color="#1b1b1b" horizontalCenter="0" fontFamily="微软雅黑" fontSize="14" text="土壤温度(℃):" width="45%" backgroundAlpha="0"/>
+			<mx:Box     id="bstemp" width="55%" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label text="43" textAlign="right" width="100%"    color="#1b1b1b" id="stemp" fontFamily="微软雅黑" fontSize="14"    verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+			 
+		<s:HGroup width="100%" height="12%" horizontalAlign="center" verticalAlign="middle">
+			<s:Label    color="#1b1b1b" horizontalCenter="0" fontFamily="微软雅黑" fontSize="14" text="土壤湿度(%rh):" width="50%" backgroundAlpha="0"/>
+			<mx:Box     id="bshumi" width="50%" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label text="78" width="100%"  textAlign="right"   color="#1b1b1b" id="shumi" fontFamily="微软雅黑" fontSize="14"    verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+		<s:HGroup width="100%" height="12%" horizontalAlign="center" verticalAlign="middle">
+			<s:Label    horizontalCenter="0" color="#1b1b1b" text="一氧化碳(ppm):" fontFamily="微软雅黑" fontSize="14" width="50%" backgroundAlpha="0"/>
+			<mx:Box    id="bco" width="50%" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label  text="5" width="100%" textAlign="right"    color="#1b1b1b" id="co"  fontFamily="微软雅黑" fontSize="14"   verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+		<s:HGroup width="100%" height="12%" horizontalAlign="center" verticalAlign="middle">
+
+			<s:Label  horizontalCenter="0" color="#1b1b1b" text="土壤PH:" fontFamily="微软雅黑" fontSize="14" width="45%" backgroundAlpha="0"/>
+			<mx:Box   width="55%"  id="bph" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label text="12" width="100%" textAlign="right"   color="#1b1b1b" id="ph"   fontFamily="微软雅黑" fontSize="14"  verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+		<s:HGroup width="100%" height="12%" horizontalAlign="center" verticalAlign="middle">
+			
+			<s:Label   horizontalCenter="0" color="#1b1b1b" text="光照(lux):" fontFamily="微软雅黑" fontSize="14" width="45%" backgroundAlpha="0"/>
+			<mx:Box     id="blight" width="55%" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label text="7899" width="100%" textAlign="right"   color="#1b1b1b" id="light"   fontFamily="微软雅黑" fontSize="14"  verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+		<s:HGroup width="100%" height="12%" horizontalAlign="center" verticalAlign="middle">
+			<s:Label   horizontalCenter="0" color="#1b1b1b" text="二氧化碳(ppm):" fontFamily="微软雅黑" fontSize="14" width="50%" backgroundAlpha="0"/>
+			<mx:Box   width="50%"  id="bco2" paddingLeft="0" paddingRight="0" paddingTop="0" paddingBottom="0">
+				<s:Label text="7899" width="100%"  textAlign="right" color="#1b1b1b"  id="co2" fontFamily="微软雅黑" fontSize="14"    verticalAlign="middle" horizontalCenter="0"/>
+			</mx:Box>
+		</s:HGroup>
+	</s:VGroup>
+	 
+</s:BorderContainer>

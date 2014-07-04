@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark"  destructionPolicy="never"  backgroundAlpha="0.3"    xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" removedFromStage="remove_Handle()"  creationComplete="create()">
+		xmlns:s="library://ns.adobe.com/flex/spark"       backgroundAlpha="0.3"    xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" removedFromStage="remove_Handle()"  creationComplete="create()" xmlns:components="components.*" xmlns:views="views.*">
+	<fx:Declarations>
+	</fx:Declarations>
 		<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
 		.itextInput
@@ -9,34 +11,17 @@
 			showPromptWhenFocused: false;
 			borderVisible:false;
 		}
-			
-	   .errorTip {
-		   
-					borderColor: #1d953f;
-				    color: white;
-				    fontSize: 14;
-				   fontWeight: normal;
-		}
-			.labStyle
-			{
-				fontSize: 50;
-				textAlign:center;
-				color: white;
-				backgroundColor:halogreen;
-				backgroundAlpha:1;
-				verticalAlign:middle;
-			}
+		 
 	</fx:Style>
+	
 	<fx:Script>
 		<![CDATA[
-			import flash.utils.setTimeout;
-			
 			import mx.collections.ArrayCollection;
-			import mx.controls.ToolTip;
 			import mx.core.FlexGlobals;
-			import mx.effects.Glow;
+			import mx.effects.Move;
+			import mx.effects.easing.Bounce;
+			import mx.events.EffectEvent;
 			import mx.events.FlexEvent;
-			import mx.managers.ToolTipManager;
 			import mx.messaging.ChannelSet;
 			import mx.messaging.channels.AMFChannel;
 			import mx.rpc.events.FaultEvent;
@@ -47,187 +32,109 @@
 			import spark.components.Image;
 			import spark.managers.PersistenceManager;
 			import spark.skins.mobile.TextInputSkin;
+			import spark.transitions.CrossFadeViewTransition;
 			
 			import components.DataPump;
 			import components.DataPumpHelper;
+			import components.LoginGroup;
+			import components.ServerGroup;
 			
 			import controller.SensingFeed;
 			
-			import model.NodeInfo;
 			import model.SensingEntry;
 			
-			import skins.MyButtonSkin;
+		 
 			private var feed:SensingFeed;
-			private	var startX:Number;
-			private	var	startY:Number;
-			private	var rc3y:Number;
-			private	var	rc4y:Number;
-			private	var	flag:Boolean=true;
-			[Bindable]
-			private	var	isServer:Boolean=false;
-			[Bindable]
-			private	var	isLogin:Boolean=false;
-			private	var	lab_tip:Label;
+		 
 			private var moteAreaMap:Dictionary = new Dictionary;//icon to Area
-			private var storeMap:Dictionary ;
-			private var moteToolTipMap:Dictionary = new Dictionary;//icon to tooltip object
+			 
+		 
 			private  var datapump:DataPumpHelper  = new DataPumpHelper();
 			private  var datap:DataPump = datapump.getDataPump();
 			private var myAMF:AMFChannel=new AMFChannel;
 			private var channelSet:ChannelSet=new ChannelSet;
 			private var ro:RemoteObject = new RemoteObject;
-			private var loginro:RemoteObject = new RemoteObject;
-			private var posRo:RemoteObject = new RemoteObject;
-			private var ipReg:RegExp =/^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)$/ ;
-			private var portReg:RegExp =/^[1-9]{1}[0-9]{1,}$/ ;
-			[Bindable]
-			private var strBtn:String="Unlock";
-			[Bindable] [Embed (source="assets/HT.png")] private static var HT:Class;
-			[Bindable] [Embed (source="assets/L.png")] private static var L:Class;
-			[Bindable] [Embed (source="assets/SHT.png")] private static var SHT:Class;
-			[Bindable] [Embed (source="assets/CO.png")] private static var CO:Class;
-			[Bindable] [Embed (source="assets/CO2.png")] private static var CO2:Class;
-			[Bindable] [Embed (source="assets/PH.png")] private static var PH:Class;
-			private function removeFromStage():void{
-			}
-			private function submit(event:FlexEvent):void{
-				if(ipReg.test(ipaddr.text)&&portReg.test(iport.text)){
-					trace("ip和port格式验证正确！！！！！");
-					
-					var persistencemanager:PersistenceManager=new PersistenceManager();
-					if(persistencemanager.load())
-					{
-						persistencemanager.setProperty("serverAddress","http://"+ipaddr.text+":"+iport.text+"/greenhouse-server/messagebroker/amf");
-						persistencemanager.setProperty("serverIp",ipaddr.text);
-						persistencemanager.setProperty("serverPort",iport.text);
-						persistencemanager.save();
-						isServer=false;
-						ilogin.enabled=true;
-					}
-				}else{
-					ipaddr.text="";
-					iport.text="";
-					iport.prompt="请输入正确的端口号";
-					ipaddr.prompt="请输入正确的ip";
-				}
-			}
-			private function enter_submit(event:FlexEvent):void{
-				lmessage.text="";
-				if(StringUtil.trim(uname.text)!=""&&StringUtil.trim(upass.text)!="")
-				{
-					var persistencemanager:PersistenceManager=new PersistenceManager();
-					if(persistencemanager.load())
-					{
-						isLogin=false;
-						ishow.enabled=true;
-						persistencemanager.setProperty("uname",uname.text);
-						persistencemanager.setProperty("upword",upass.text);
-						persistencemanager.save();
-						if(persistencemanager.getProperty("serverAddress"))
-						{
-							myAMF.url=persistencemanager.getProperty("serverAddress").toString();
-							channelSet.addChannel(myAMF); 
-							loginro.channelSet = channelSet;
-							loginro.destination="UserService";//验证用户身份
-							loginro.addEventListener(ResultEvent.RESULT,Login_handler);
-							loginro.addEventListener(FaultEvent.FAULT,faultHandle);
-							lmessage.text="正在登录----";
-							loginro.queryUser(uname.text,upass.text);//请求服务端对用户的身份验证
-						}
-						else
-						{
-							lmessage.text="服务器地址未知";
-						}
-					}
-				}
-			}
+		 
+			private	var login:LoginGroup;
+			private var	loginShow:Boolean=false;
+			private	var connectGp:ServerGroup;
+			private var	connectShow:Boolean=false;
+			private	var cross:CrossFadeViewTransition=new CrossFadeViewTransition;
+			
+			private var	first_datashow:Boolean=true;
 			private function rc1Click(evt:MouseEvent):void
 			{
-				navigator.pushView(views.HistoryView,moteAreaMap);
+				
+				navigator.pushView(views.HistoryView,moteAreaMap,null,cross);
 				FlexGlobals.topLevelApplication.selectedArea=1;
 			}
 			private function rc2Click(evt:MouseEvent):void
 			{
 				 
-				navigator.pushView(views.HistoryView,moteAreaMap);
+				navigator.pushView(views.HistoryView,moteAreaMap,null,cross);
 				FlexGlobals.topLevelApplication.selectedArea=2;
 			}
 			private function rc3Click(evt:MouseEvent):void
 			{
 				 
-				navigator.pushView(views.HistoryView,moteAreaMap);
-				FlexGlobals.topLevelApplication.selectedArea=4;
+				navigator.pushView(views.HistoryView,moteAreaMap,null,cross);
+				FlexGlobals.topLevelApplication.selectedArea=3;
 			}
 			private function rc4Click(evt:MouseEvent):void
 			{
-			    navigator.pushView(views.HistoryView,moteAreaMap);
-				FlexGlobals.topLevelApplication.selectedArea=3;
+			    navigator.pushView(views.HistoryView,moteAreaMap,null,cross);
+				FlexGlobals.topLevelApplication.selectedArea=4;
 			}
 			private function remove_Handle():void
 			{
-				trace("remove_Handle()");
-				
+				if(login&&loginShow)
+				{
+					this.removeElement(login);
+					login=null;
+				}
+				if(connectGp&&connectShow)
+				{
+					this.removeElement(connectGp);
+					connectGp=null;
+				}
 			}
 			private function init():void
 			{
-		// 	this.width=Capabilities.screenResolutionX;   
-		// 		this.height= Capabilities.screenResolutionY; 
+				bg.addEventListener(MouseEvent.MOUSE_DOWN,down_handle);
 				var persistencemanager:PersistenceManager=new PersistenceManager();
-				if(persistencemanager.load())
+				if(persistencemanager.getProperty("serverAddress"))
 				{
-					if(persistencemanager.getProperty("serverIp"))
-					{
-						ipaddr.text=String(persistencemanager.getProperty("serverIp"));
-					}
-					if(persistencemanager.getProperty("serverPort"))
-					{
-						iport.text=String(persistencemanager.getProperty("serverPort"));
-					}
-					if(persistencemanager.getProperty("uname"))
-					{
-						uname.text=persistencemanager.getProperty("uname").toString();
-					}
-					if(persistencemanager.getProperty("upword"))
-					{
-						upass.text=persistencemanager.getProperty("upword").toString();
-					}
-					if(persistencemanager.getProperty("serverAddress"))
-					{
-						myAMF.url=persistencemanager.getProperty("serverAddress").toString();
-						
-						channelSet.addChannel(myAMF); 
-						ro.channelSet = channelSet;
-						ro.destination="FindNewestSense";
-						ro.addEventListener(ResultEvent.RESULT,ds_resulted);
-						ro.addEventListener(FaultEvent.FAULT,faultHandle);
-						ro.GetNewestSense();
-						posRo.channelSet = channelSet;
-						posRo.destination="AreaMapService";
-						posRo.addEventListener(ResultEvent.RESULT,AreaMap_resulted);
-						posRo.addEventListener(FaultEvent.FAULT,faultHandle);
-						FlexGlobals.topLevelApplication.GlobalBusy=false;
-					}
-					else
-					{
-						FlexGlobals.topLevelApplication.GlobalBusy=true;
-					}
-				 
+					myAMF.url=persistencemanager.getProperty("serverAddress").toString();
+					
+					channelSet.addChannel(myAMF); 
+					ro.channelSet = channelSet;
+					ro.destination="FindNewestSense";
+					ro.addEventListener(ResultEvent.RESULT,ds_resulted);
+					ro.addEventListener(FaultEvent.FAULT,faultHandle);
+					ro.GetNewestSense();
+					
+					FlexGlobals.topLevelApplication.GlobalBusy=false;
 				}
-				iport.addEventListener(FlexEvent.ENTER,submit);
-				ipaddr.addEventListener(FlexEvent.ENTER,submit);
-				uname.addEventListener(FlexEvent.ENTER,enter_submit);
-				upass.addEventListener(FlexEvent.ENTER,enter_submit);
+				else
+				{
+					FlexGlobals.topLevelApplication.GlobalBusy=true;
+				}
+				 
 				datap.addEventListener("_newSensingData",newData);
 				feed=new SensingFeed();
-				rc1.doubleClickEnabled=true;
-				rc2.doubleClickEnabled=true;
-				rc3.doubleClickEnabled=true;
-				rc4.doubleClickEnabled=true;
-				
-				rc1.addEventListener(MouseEvent.DOUBLE_CLICK,rc1Click);
-				rc2.addEventListener(MouseEvent.DOUBLE_CLICK,rc2Click);
-				rc3.addEventListener(MouseEvent.DOUBLE_CLICK,rc3Click);
-				rc4.addEventListener(MouseEvent.DOUBLE_CLICK,rc4Click);
+			}
+			private function down_handle(evt:MouseEvent):void
+			{
+				if(login&&loginShow)
+				{
+					this.removeElement(login);
+					loginShow=false;
+				}
+				if(connectGp&&connectShow)
+				{
+					this.removeElement(connectGp);
+					connectShow=false;
+				}
 				
 			}
 			private  function  faultHandle(event:FaultEvent):void
@@ -236,40 +143,7 @@
 				trace(event.fault.faultString);
 				trace(event.fault.faultDetail);
 			}
-			private function AreaMap_resulted(event:ResultEvent):void{
-				var result=event.result;
-				lmessage.text="";
-				if(event.result=="")
-				{
-					lmessage.text="未登陆";
-				}
-				else if(event.result=="fail")
-				{
-					lmessage.text="其他用户在使用";
-				}
-				else
-				{
-					lmessage.text="设置成功";
-				}
-			}
-			
-			private  function Login_handler(e:ResultEvent):void{
-				lmessage.text="";
-				lock.enabled=false;
-				FlexGlobals.topLevelApplication.currentUser="";
-				if(e.result!="")
-				{
-					var a:String=StringUtil.trim(e.result.toString());
-					FlexGlobals.topLevelApplication.currentUser=a;
-					lmessage.text="登录成功";
-					lock.enabled=true;
-					trace("currentUser"+a);
-				}
-				else
-				{
-					lmessage.text="该用户不存在";
-				}
-			}
+		 
 			private function ds_resulted(event:ResultEvent):void{
 				trace(" ds_resulted");
 				FlexGlobals.topLevelApplication.newestSensingList.removeAll();
@@ -309,402 +183,318 @@
 					//trace(se.Moteid_ID+","+se.Area+","+se.sensingType+","+se.temperature+","+se.humidity+","+se.light+","+se.CO2+","+se.nodeType);
 					FlexGlobals.topLevelApplication.newestSensingList.addItem(se);
 			   }
-			node_show();
+			data_show();
 			}
-			private function node_show():void
+			private function data_show():void
 			{
-				    trace("node_show");
-				  //  trace("initX initY"+rc1.x+","+rc1.y+";"+rc2.x+","+rc2.y+";"+rc3.x+","+rc3y+";"+rc4.x+","+rc4y);
-					var init1X:Number=rc1.x+30;
-					var init1Y:Number=rc1.y+30;
-					var init2X:Number=rc2.x+30;
-					var init2Y:Number=rc2.y+30;
-					var init3X:Number=rc3.x+30;
-					var init3Y:Number=rc3y+30;
-					var init4X:Number=rc4.x+30;
-					var init4Y:Number=rc4y+30;
-				trace("FlexGlobals.topLevelApplication.newestSensingList.length"+FlexGlobals.topLevelApplication.newestSensingList.length);
-					for(var i:int=0;i<FlexGlobals.topLevelApplication.newestSensingList.length;i++)
+			      trace("FlexGlobals.topLevelApplication.newestSensingList.length"+FlexGlobals.topLevelApplication.newestSensingList.length);
+				for(var i:int=0;i<FlexGlobals.topLevelApplication.newestSensingList.length;i++)
 					{
-						var img:Image = new Image();
-						img.id=FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).Moteid_ID;
-					//	trace("img.id"+img.id);
-						switch(FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).sensingType)
-						{
-							case "HT":img.source=HT;
-								img.name="HT";
-						     	break;
-							case "CO2":img.source=CO2;
-								img.name="CO2";
-								 break;
-							case "CO":img.source=CO;
-								img.name="CO";
-			                    break;
-							case "L":img.source=L;
-								img.name="L";
-		                        break;
-							case "SHT":img.source=SHT;
-								img.name="SHT";
-							     break;
-							case "PH":img.source=PH;
-								img.name="PH";
-								 	break;
-							default:break;
-						}
-						switch(FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).Area)
-						{
-							case 1:img.x=init1X;
-								   img.y=init1Y;
-								   if(init1X+140>rc1.x+rc1.width)
-								   {
-									   img.x=rc1.x+30;
-									   init1X=img.x+140;
-									   init1Y=init1Y+80;
-									   img.y=init1Y;
-								   }
-								   else
-								   {
-									   init1X=img.x+140;
-								   }
-								   moteAreaMap[img]=1;
-								   break;
-							case 2:img.x=init2X;
-								img.y=init2Y;
-								if(init2X+140>rc2.x+rc2.width)
-								{
-									img.x=rc2.x+30;
-									init2X=img.x+140;
-									init2Y=init2Y+80;
-									img.y=init2Y;
-								}
-								else
-								{
-									init2X=img.x+140;
-								}
-								moteAreaMap[img]=2;
-								   break;
-							case 4:img.x=init3X;
-								   img.y=init3Y;
-								   if(init3X+140>rc3.x+rc3.width)
-							    	{
-									img.x=rc3.x+30;
-									init3X=img.x+140;
-									init3Y=init3Y+80;
-									img.y=init3Y;
-							    	}
-							    	else
-							    	{
-									init3X=img.x+140;
-							       	}
-								    moteAreaMap[img]=3;
-								     break;
-							case 3:img.x=init4X;
-								   img.y=init4Y;
-								   if(init4X+140>rc4.x+rc4.width)
-								  {
-									img.x=rc4.x+30;
-									init4X=img.x+140;
-									init4Y=init4Y+80;
-									img.y=init4Y;
-								  }
-								  else
-								  {
-									init4X=img.x+140;
-								  }
-								  moteAreaMap[img]=4;
-								   break;
-							default:break;
-						}
-						img.depth=2;
-						this.addElement(img);
-					  }
-					
-				 
-		 //	show_Tooltip();
-		//		setTimeout(function():void {show_Tooltip();},2000); 
+					 moteAreaMap[FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i)]=FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).Area;
+					 data_Update(FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i));
+				  }
+				first_datashow=false;
 			}
 			private function create():void
 			{
-			
-				lock.enabled=false;
-				rc3y=rc1.y+rc1.height+rc2.x-rc1.width;
-				rc4y=rc3y;
+				rdg1.area.text="区域一";
+			 
+				rdg1.searchHis.addEventListener(MouseEvent.CLICK,rc1Click);
+				rdg2.area.text="区域二";
+			 
+				rdg2.searchHis.addEventListener(MouseEvent.CLICK,rc2Click);
+				rdg3.area.text="区域三";
+			 
+				rdg3.searchHis.addEventListener(MouseEvent.CLICK,rc3Click);
+				rdg4.area.text="区域四";
+			 
+				rdg4.searchHis.addEventListener(MouseEvent.CLICK,rc4Click);
+            }
+			private function data_Update(se:SensingEntry):void
+			{
+				var targetArr:Array=new Array;
+				var mov:Move = new Move();
+				
+				mov.xBy=-60;
+				mov.duration=600;
+				
+				switch(se.sensingType)
+				{
+					case "HT":	switch(se.Area)
+					{
+						case 1:  rdg1.temp.text=se.temperature.toString();
+							rdg1.humi.text=se.humidity.toString();
+							targetArr.push(rdg1.btemp);
+							targetArr.push(rdg1.bhumi);
+						 
+							break;
+						case 2: rdg2.temp.text=se.temperature.toString();
+							rdg2.humi.text=se.humidity.toString();
+							targetArr.push(rdg2.btemp);
+							targetArr.push(rdg2.bhumi);
+						 
+							break;
+						case 3: rdg3.temp.text=se.temperature.toString();
+							rdg3.humi.text=se.humidity.toString();
+							targetArr.push(rdg3.btemp);
+							targetArr.push(rdg3.bhumi);
+						 
+							break;
+						case 4: rdg4.temp.text=se.temperature.toString();
+							rdg4.humi.text=se.humidity.toString();
+							targetArr.push(rdg4.btemp);
+							targetArr.push(rdg4.bhumi);
+						 
+							break;
+					}
+						break;
+					case "CO2":switch(se.Area)
+					{
+						case 1:  rdg1.co2.text=se.CO2.toString();
+							targetArr.push(rdg1.bco2);
+						 
+							break;
+						case 2:  rdg2.co2.text=se.CO2.toString();
+							targetArr.push(rdg2.bco2);
+						 
+							break;
+						case 3: rdg3.co2.text=se.CO2.toString();
+							targetArr.push(rdg3.bco2);
+						 
+							break;
+						case 4:  rdg4.co2.text=se.CO2.toString();
+							targetArr.push(rdg4.bco2);
+						 
+							break;
+					}
+						break;
+					case "CO":switch(se.Area)
+					{
+						case 1:  rdg1.co.text=se.CO2.toString();
+							targetArr.push(rdg1.bco);
+							 
+							break;
+						case 2:  rdg2.co.text=se.CO2.toString();
+							targetArr.push(rdg2.bco);
+							 
+							break;
+						case 3: rdg3.co.text=se.CO2.toString();
+							targetArr.push(rdg3.bco);
+							
+						 
+							break;
+						case 4:  rdg4.co.text=se.CO2.toString();
+							targetArr.push(rdg4.bco);
+							
+						 
+							break;
+					}
+						break;
+					case "L":switch(se.Area)
+					{
+						case 1:  rdg1.light.text=se.light.toString();
+							targetArr.push(rdg1.blight);
+							
+							 
+							break;
+						case 2:   rdg2.light.text=se.light.toString();
+							targetArr.push(rdg2.blight);
+							
+						 
+							break;
+						case 3:  rdg3.light.text=se.light.toString();
+							targetArr.push(rdg3.blight);
+							
+							 
+							break;
+						case 4:   rdg4.light.text=se.light.toString();
+							targetArr.push(rdg4.blight);
+							
+						 
+							break;
+					}
+						break;
+					case "SHT":
+						
+						switch(se.Area)
+					{
+						case 1:    rdg1.stemp.text=se.A0.toString();
+							rdg1.shumi.text=se.A1.toString();
+							targetArr.push(rdg1.bstemp);
+							targetArr.push(rdg1.bshumi);
+							 
+							break;
+						case 2:    rdg2.stemp.text=se.A0.toString();
+							rdg2.shumi.text=se.A1.toString();
+							targetArr.push(rdg2.bstemp);
+							targetArr.push(rdg2.bshumi);
+							 
+							break;
+						case 3:   rdg3.stemp.text=se.A0.toString().toString();
+							rdg3.shumi.text=se.A1.toString();
+							targetArr.push(rdg3.bstemp);
+							targetArr.push(rdg3.bshumi);
+							 
+							break;
+						case 4:    rdg4.stemp.text=se.A0.toString();
+							rdg4.shumi.text=se.A1.toString();
+							targetArr.push(rdg4.bstemp);
+							targetArr.push(rdg4.bshumi);
+							 
+							break;
+					}
+						break;
+					case "PH":switch(se.Area)
+					{
+						case 1:  rdg1.ph.text=se.CO2.toString();
+							targetArr.push(rdg1.bph);
+							 
+							break;
+						case 2:  rdg2.ph.text=se.CO2.toString();
+							targetArr.push(rdg2.bph);
+							
+						 
+							break;
+						case 3: rdg3.ph.text=se.CO2.toString();
+							targetArr.push(rdg3.bph);
+							
+						 
+							break;
+						case 4:  rdg4.ph.text=se.CO2.toString();
+							targetArr.push(rdg4.bph);
+							
+							
+							break;
+					}
+						break;
+					default:break;
+				}
+				if(!first_datashow&&targetArr.length>0)
+				{
+					mov.play(targetArr,true);
+				}
 			}
 			private function newData(event:Event):void
 			{   
-				var moteid:String = datap.newestSensing.Moteid_ID.toString();
+				var moteid:int = datap.newestSensing.Moteid_ID;
 				var stockCount:int = FlexGlobals.topLevelApplication.newestSensingList.length;
-				for(var e:Object in moteAreaMap){
-					var i:Image  = e as Image;
-					if(i.id==moteid){
-						var glow:Glow =new Glow(i);
-						glow.alphaFrom=0;
-						glow.alphaTo=1;
-						glow.blurXFrom=60;
-						glow.blurYFrom=60;
-						glow.strength=15;
-						glow.color=0xb2d235;
-						glow.duration=2000;
-						glow.play(null,true);
-						if(flag)
-						{
-							show_Tooltip();
-							flag=false;
-						}
-						if(moteToolTipMap[e])
-						{
-							 moteToolTipMap[e].text=get_tooltip_msg(i.id);
-					    }
-						
-						break;
-					} 								
+				for(var i=0;i<stockCount;i++){
+				 if(moteid==FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).Moteid_ID)
+				 {
+				 	 //trace("newData"+moteid);
+					 data_Update(FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i));
+					 
+					 break;
+				 }
+			 
 				}
+			
+			}
+			private function resize_app():void
+			{
+				if(!FlexGlobals.topLevelApplication.isMax)
+				{
+					NativeApplication.nativeApplication.activeWindow.maximize();
+					FlexGlobals.topLevelApplication.isMax=true;
+				}
+				else
+				{
+					NativeApplication.nativeApplication.activeWindow.width=1024;
+					NativeApplication.nativeApplication.activeWindow.height=768;
+					FlexGlobals.topLevelApplication.isMax=false;
+				}
+				 
+			}
+			private function close_app():void
+			{
+				
+				NativeApplication.nativeApplication.exit();//退出
+			}
+			 
+			private function control_view():void
+			{
+				 
+				navigator.pushView(views.MyControlView,null,null,cross);
 			}
 			
-			private function show_Tooltip():void
+			private function show_login(evt:MouseEvent):void
 			{
-				//trace("show_Tooltip()");
-				for(var e:Object in moteAreaMap){
-					var i:Image  = e as Image;
-					var Msg:String = i.id;
-					if((this.width-i.x-i.width)<100){
-						moteToolTipMap[e] =  ToolTipManager.createToolTip(get_tooltip_msg(i.id), e.x-5,e.y+30,null,null) as ToolTip;
-					}else{
-						moteToolTipMap[e] =  ToolTipManager.createToolTip(get_tooltip_msg(i.id), e.x+30,e.y,null,null) as ToolTip;
-					}
-					moteToolTipMap[e].setStyle("styleName", "errorTip");
-					moteToolTipMap[e].depth=3;
-					this.addElement(moteToolTipMap[e]);
-					//trace(this.addElement(moteToolTipMap[e]));
-				}
-			}
-			private function get_tooltip_msg(msg:String):String{
-			//	trace("get_tooltip_msg"+msg+","+FlexGlobals.topLevelApplication.newestSensingList.length);
-				for(var i:int=0;i<FlexGlobals.topLevelApplication.newestSensingList.length;i++)
+				if(connectGp&&connectShow)
 				{
-					if(msg==String(FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).Moteid_ID))
-					{
-						switch(FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).sensingType)
-						{
-							case "HT":msg+="\nTemp.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).temperature+"\nHum.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).humidity;
-								break;
-							case "CO2":msg+="\nCO2.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).CO2;
-								break;
-							case "CO":msg+="\nCO.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).CO2;
-								break;
-							case "L":msg+="\nL.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).light;
-								break;
-							case "SHT":msg+="\nSTemp.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).A0+"\nSHum.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).A1;
-								break;
-							case "PH":msg+="\nPH.:"+FlexGlobals.topLevelApplication.newestSensingList.getItemAt(i).CO2;
-								break;
-							default:break;
-						}
-						break;
-					}
+					this.removeElement(connectGp);
+					connectShow=false;
 				}
-				//trace(msg);
-				return msg;
-			}
-			private function Lock_Handle():void
-			{
-		//		iclear.enabled=false;
-				lmessage.text="";
-				rc1.removeEventListener(MouseEvent.DOUBLE_CLICK,rc1Click);
-				rc2.removeEventListener(MouseEvent.DOUBLE_CLICK,rc2Click);
-				rc3.removeEventListener(MouseEvent.DOUBLE_CLICK,rc3Click);
-				rc4.removeEventListener(MouseEvent.DOUBLE_CLICK,rc4Click);
-				for(var e:Object in moteAreaMap){
-					var img:Image=e as Image;
-					img.addEventListener(MouseEvent.MOUSE_DOWN,downHandler);
-					img.addEventListener(MouseEvent.MOUSE_UP,upHandler);
-					
-				}
-					 lock.visible=false;
-					 lock.includeInLayout=false;
-					 unlock.visible=true;
-					 unlock.includeInLayout=true;
-				
-			}
-			private function UnLock_Handle():void
-			{
-				
-			//	iclear.enabled=true;
-				lmessage.text="";
-				var collect:ArrayCollection=new ArrayCollection;
-				var str:String="";
-				for(var e:Object in moteAreaMap){
-					trace("var e:Object in moteAreaMap");
-					var img:Image=e as Image;
-					img.removeEventListener(MouseEvent.MOUSE_DOWN,downHandler);
-					img.removeEventListener(MouseEvent.MOUSE_UP,upHandler);
-					if(img.x>=rc1.x&&img.x<=(rc1.x+rc1.width)&&img.y>=rc1.y&&img.y<=(rc1.y+rc1.height))
-					{
-						moteAreaMap[e]=1;
-						//	trace("区域对应"+img.id+":"+moteAreaMap[e]);
-					}
-					else if(img.x>=rc2.x&&img.x<=(rc2.x+rc2.width)&&img.y>=rc2.y&&img.y<=(rc2.y+rc2.height))
-					{
-						moteAreaMap[e]=2;
-						//	trace("区域对应"+img.id+":"+moteAreaMap[e]);
-					}
-					else if(img.x>=rc3.x&&img.x<=(rc3.x+rc3.width)&&img.y>=rc3y&&img.y<=(rc3y+rc3.height))
-					{
-						moteAreaMap[e]=4;
-						//	trace("区域对应"+img.id+":"+moteAreaMap[e]);
-					}
-					else if(img.x>=rc4.x&&img.x<=(rc4.x+rc4.width)&&img.y>=rc4y&&img.y<=(rc4y+rc4.height))
-					{
-						moteAreaMap[e]=3;
-						//	trace("区域对应"+img.id+":"+moteAreaMap[e]);
-					}
-					else
-					{
-						//	trace("区域对应错误");
-					}
-					str=img.id+","+String(moteAreaMap[e]);
-					//trace(str);
-					collect.addItem(str);
-				}
-				posRo.saveAreaMap(collect,FlexGlobals.topLevelApplication.currentUser);
-				
-				rc1.addEventListener(MouseEvent.DOUBLE_CLICK,rc1Click);
-				rc2.addEventListener(MouseEvent.DOUBLE_CLICK,rc2Click);
-				rc3.addEventListener(MouseEvent.DOUBLE_CLICK,rc3Click);
-				rc4.addEventListener(MouseEvent.DOUBLE_CLICK,rc4Click);
-				
-				lock.visible=true;
-				lock.includeInLayout=true;
-				unlock.visible=false;
-				unlock.includeInLayout=false;
-			}
-			private function show_Handle():void
-			{
-				lmessage.text="";
-				isServer=true;
-				ilogin.enabled=false;
-				trace("show_Handle()");
-			}
-			private function show_LoginWindow():void
-			{
-				lmessage.text="";
-				isLogin=true;
-				ishow.enabled=false;
-				trace("show_Handle()");
-			}
-		
-			private function downHandler(event:MouseEvent):void {
-				if(moteToolTipMap[event.currentTarget])
+				if(!login)
 				{
-					this.removeElement(moteToolTipMap[event.currentTarget]);
-					
-					moteToolTipMap[event.currentTarget]=null;
+					login=new LoginGroup;
 				}
-				const tmp:Object = event.currentTarget;
-				
-				tmp.startDrag();
-				startX = event.stageX; // stageX, stageY 是相对于整个applicationde位置
-				startY = event.stageY;
+				 login.width=210;
+				 login.height=100;
+				 login.x=evt.stageX-120;
+				 login.y=evt.stageY-15;
+			     this.addElement(login);
+				 loginShow=true;
 			}
-			private function upHandler(event:MouseEvent):void {
-				const tmp:Object = event.currentTarget;
-				tmp.stopDrag();
-				
-				tmp.x += event.stageX -  startX;
-				tmp.y += event.stageY - startY;
-				 
-				var i:Image  = event.currentTarget as Image;
-				var Msg:String =  i.id;
-			 
-				if((this.width-i.x-i.width)<100){
-					moteToolTipMap[i] =  ToolTipManager.createToolTip(get_tooltip_msg(Msg),i.x-5,i.y-30,null,i) as ToolTip;
-				}else{
-					moteToolTipMap[i] =  ToolTipManager.createToolTip(get_tooltip_msg(Msg), i.x+30,i.y,null,i) as ToolTip;
+			private function show_connect(evt:MouseEvent):void
+			{
+				if(login&&loginShow)
+				{
+					this.removeElement(login);
+					loginShow=false;
 				}
-				moteToolTipMap[i].setStyle("styleName", "errorTip");
-				moteToolTipMap[i].depth=3;
-				this.addElement(moteToolTipMap[i]);
+				if(!connectGp)
+				{
+					connectGp=new  ServerGroup;
+				}
+				connectGp.width=210;
+				connectGp.height=100;
+				connectGp.x=evt.stageX-120;
+				connectGp.y=evt.stageY-15;
+				this.addElement(connectGp);
+				connectShow=true;
 			}
 	]]>
 	</fx:Script>
+	 
 	<s:navigationContent>
-		<!--s:Image source="@Embed('assets/ip.png')"  click="show_IPWindow()"  /-->	
-		<!--s:Button id="clear"  color="haloblue" click="Clear_Handle()"   height="50"   horizontalCenter="0" fontSize="25"   verticalCenter="0"  icon="@Embed('assets/clear.png')" iconPlacement="top" label=""  /-->
-		 
-			<s:Label   fontSize="15"  id="lmessage" color="#F00000" />
-		 
-		
-	</s:navigationContent>
-	<s:titleContent>
-		<s:HGroup includeInLayout="{isServer}" visible="{isServer}"  horizontalAlign="center" width="100%" height="100%" verticalCenter="0" verticalAlign="middle">
-			<s:Label  text="IP" fontSize="25"  horizontalCenter="0" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
-			<s:TextInput styleName="itextInput" verticalCenter="0" width="30%" color="haloblue"    height="85%"  id="ipaddr"  prompt="输入IP"  skinClass="spark.skins.mobile.TextInputSkin" />
-			<s:Spacer width="5%"/>
-			<s:Label  text="Port" fontSize="25"  horizontalCenter="0" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
-			<s:TextInput styleName="itextInput" horizontalCenter="0" color="haloblue"   verticalCenter="0" width="30%"    height="85%"  id="iport"  prompt="输入端口"  skinClass="spark.skins.mobile.TextInputSkin" />
-		</s:HGroup>
-		<s:HGroup includeInLayout="{isLogin}" visible="{isLogin}"  horizontalAlign="center" width="100%" height="100%" verticalCenter="0" verticalAlign="middle">
-			<s:Label  text="用户名" fontSize="25"  horizontalCenter="0" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
-			<s:TextInput styleName="itextInput" color="haloblue" verticalCenter="0" width="30%"    height="80%"  id="uname"  prompt="用户名"  skinClass="spark.skins.mobile.TextInputSkin" />
-			<s:Spacer width="5%"/>
-			<s:Label fontSize="25" text="密码" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
-			<s:TextInput styleName="itextInput" displayAsPassword="true" color="haloblue" horizontalCenter="0"   verticalCenter="0" width="30%"    height="80%"  id="upass"  prompt="密码"  skinClass="spark.skins.mobile.TextInputSkin" />
-		</s:HGroup>
-	</s:titleContent>
+		<s:Spacer width="25"/>
+		<s:Image id="historyshow" source="assets/history_active.png"     smooth="true" />
+		<s:Image id="splitshow" source="@Embed('assets/split.png')"     smooth="true" />
+		<s:Image id="controlshow" click="control_view()"	source="assets/control_btn.png"     smooth="true" />  
+	 </s:navigationContent>
+	 
 	<s:actionContent>
-		<s:HGroup>
-			<!--s:Button id="lock"  color="haloblue" click="Lock_Handle()"   height="55" horizontalCenter="0" fontSize="25"  verticalCenter="0" label="{strBtn}" skinClass="skins.MyButton" /-->
-			<s:Image id="ishow" source="@Embed('assets/addr.png')"  click="show_Handle()"  smooth="true" />	
-			<s:Image id="ilogin" smooth="true" source="@Embed('assets/loginIcon.png')"  click="show_LoginWindow()"/>
-            <s:Image smooth="true"  source="@Embed('assets/lock.png')" id="lock" click="Lock_Handle()" visible="true" includeInLayout="true"/>
-            <s:Image smooth="true"  source="@Embed('assets/unlock.png')" id="unlock" click="UnLock_Handle()" visible="false" includeInLayout="false"/>
-		</s:HGroup>
+		<s:HGroup verticalAlign="middle">
+ 			<!--s:Image id="ishow" source="@Embed('assets/addr.png')"  click="show_Handle()"  smooth="true" /-->
+			<s:Image id="splitshow1" source="@Embed('assets/split.png')"     smooth="true" />
+		    <s:Label text="设置" fontSize="20" color="#999999" click="show_connect(event)"  fontFamily="微软雅黑"   verticalAlign="middle"/>
+			<s:Image id="splitshow4" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Label text="登录" fontSize="20" color="#999999"  fontFamily="微软雅黑" click="show_login(event)"   verticalAlign="middle"/>
+			<s:Image id="splitshow2" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Image id="changesizeshow" source="@Embed('assets/max.png')"  buttonMode="true" click="resize_app()"    smooth="true" />
+			<s:Image id="splitshow3" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Image id="closeshow" source="@Embed('assets/close_btn.png')"  buttonMode="true" click="close_app()"    smooth="true" />
+			<s:Spacer width="5"/>
+ 		</s:HGroup>
 	</s:actionContent>
-	 <s:VGroup height="{Capabilities.screenResolutionY}" width="{Capabilities.screenResolutionX}">
-		 <s:HGroup height="43%" width="100%">
-		 
-			 <s:Group id="rc1" height="100%" width="50%" >
-				 <s:Label text="1区" backgroundAlpha="0"/>
-				 <s:Rect height="100%" width="100%"   >    
-					 <s:stroke>
-						 <s:SolidColorStroke color="0x000000" weight="2"/>
-					 </s:stroke>
-					 <s:fill >
-						 <!--s:BitmapFill fillMode="scale" source="@Embed('assets/grass1.jpg')" smooth="true"/-->
-						 <s:BitmapFill fillMode="scale" source="@Embed('assets/grass1.png')" smooth="true"/>
-					 </s:fill>
-				 </s:Rect>
-				
-			 </s:Group>
-			
-			 <s:Group id="rc2" height="100%" width="50%">
-				 <s:Label text="2区" backgroundAlpha="0"/>
-				 <s:Rect height="100%" width="100%">    
-					 <s:stroke>
-						 <s:SolidColorStroke color="0x000000" weight="2"/>
-					 </s:stroke>
-				 </s:Rect>
-			 </s:Group>
+	 
+	 <s:Image id="bg"   scaleMode="stretch" source="assets/mainview.png" width="100%" height="100%" smooth="true"/>
+	 <!--s:VGroup   height="{Capabilities.screenResolutionY}" width="{Capabilities.screenResolutionX}"-->
+	 <s:VGroup   gap="27"  horizontalAlign="center"  verticalAlign="middle"  height="{this.height}" width="{this.width}">
+		 <s:HGroup gap="27" width="80%" height="40%" horizontalAlign="center" verticalAlign="middle">
+			 <components:RealDataGroup  backgroundImage="@Embed('assets/area1.png')" id="rdg1" width="35%" height="100%"/>
+			 <components:RealDataGroup backgroundImage="@Embed('assets/area2.png')" id="rdg2" width="35%" height="100%"/>
+			 <!--s:Image smooth="true" source="assets/area1.png"   height="100%"/>
+			 <s:Image smooth="true" source="assets/area2.png"   height="100%"/-->
 		 </s:HGroup>
-		 <s:HGroup height="50%" width="100%">
-			 <s:Group id="rc3" height="100%" width="50%">
-				 <s:Label text="4区" backgroundAlpha="0"/>
-				 <s:Rect height="100%" width="100%">    
-					 <s:stroke>
-						 <s:SolidColorStroke color="0x000000" weight="2"/>
-					 </s:stroke>
-				 </s:Rect>
-			 </s:Group>
-			 <s:Group id="rc4" height="100%" width="50%" >
-				 <s:Label text="3区" backgroundAlpha="0"/>
-				 <s:Rect height="100%" width="100%">    
-					 <s:stroke>
-						 <s:SolidColorStroke color="0x000000" weight="2"/>
-					 </s:stroke>
-				 </s:Rect>
-			 </s:Group>
+		 <s:HGroup gap="27" width="80%" height="40%" horizontalAlign="center" verticalAlign="middle">
+			 <components:RealDataGroup backgroundImage="@Embed('assets/area4.png')" id="rdg4" width="35%" height="100%"/>
+			 <components:RealDataGroup backgroundImage="@Embed('assets/area3.png')" id="rdg3" width="35%" height="100%"/>
+			 <!--s:Image smooth="true" source="assets/area4.png"   height="100%"/>
+			 <s:Image smooth="true" source="assets/area3.png"   height="100%"/-->
 		 </s:HGroup>
-	 </s:VGroup>
+	</s:VGroup>
+	 
 	<s:BusyIndicator horizontalCenter="0" verticalCenter="0" id="busy" visible="{FlexGlobals.topLevelApplication.GlobalBusy}" width="60" height="60" right="0"  symbolColor="haloblue" >
 	</s:BusyIndicator> 
 </s:View>

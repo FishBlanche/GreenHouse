@@ -7,6 +7,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import skins.LeftButtonSkin;
+			import skins.RightButtonSkin;
 			 
 			
 		]]>
@@ -19,6 +21,12 @@
 		<s:Label text="控制组"  verticalAlign="middle"  textAlign="center" backgroundAlpha="0" width="10%"   fontSize="20" height="80%" color="#1d953f"/>
 		<s:Button id="rulebtn"    skinClass="skins.MyRuleButtonSkin" color="white"  horizontalCenter="0"   width="60%" label="设置"   height="80%"   fontSize="25"/>
 		<s:Label id="myTime" verticalAlign="middle"  textAlign="center" backgroundAlpha="0" width="30%"   fontSize="20" height="80%" color="#1d953f"/>
+		<s:HGroup horizontalCenter="0" verticalAlign="middle" gap="0" horizontalAlign="center" height="50" width="100">
+			<s:ToggleButton verticalCenter="0" id="On" color="white" width="45%" selected="false" click="On.selected = true;Off.selected=false;"
+							label="开" skinClass="skins.LeftButtonSkin" />
+			<s:ToggleButton verticalCenter="0" id="Off" color="white" width="45%" selected="false" click="Off.selected = true;On.selected=false;"
+							label="关" skinClass="skins.RightButtonSkin" />
+		</s:HGroup>
 		<s:Image id="myRuleDel" verticalAlign="middle"  source="assets/delIcon.png"    width="80" height="48"  smooth="true"/>
 	</s:HGroup>
 	

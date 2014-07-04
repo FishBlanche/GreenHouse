@@ -22,7 +22,7 @@ package components
 	import spark.managers.PersistenceManager;
 	
 	import model.SensingEntry;
-	import model.UrlInfo;
+ 
 
 	public class DataPump  extends EventDispatcher
 	{

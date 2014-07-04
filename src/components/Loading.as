@@ -21,7 +21,9 @@ package components
 	{  
 		public function Loading()  
 		{  
+			
 			super();  
+			 
 			
 		}  
 		private var logo:Loader;  
@@ -40,12 +42,14 @@ package components
 		 
 		override public function get stageHeight():Number
 		{
-		     return Capabilities.screenResolutionY;
+	 	     return Capabilities.screenResolutionY;
+		 
 		}
 		
 		override public function get stageWidth():Number
 		{
-			return Capabilities.screenResolutionX;
+		 	return Capabilities.screenResolutionX;
+		 
 		}
 		 
 		
@@ -134,8 +138,10 @@ package components
 		override public function initialize():void
 		{
 			// TODO Auto Generated method stub
+			 
 			stage.stageWidth=Capabilities.screenResolutionX;   
-			stage.stageHeight= Capabilities.screenResolutionY;
+			stage.stageHeight= Capabilities.screenResolutionY; 
+			 
 			super.initialize();
 		//	trace("initialize"+stage.stageWidth+","+stage.stageHeight);
 	 

@@ -16,8 +16,8 @@
 	</fx:Declarations>
 	
 	<s:HGroup width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" >
-		<s:Image id="humidifier" source="assets/humidifier.png" width="80" height="48" smooth="true"/>
-		<s:Label text="" width="25%" height="100%"/>
+		<s:Image id="humidifier"   width="85" height="53" smooth="true"/>
+		 
 		<s:HGroup gap="0" verticalAlign="middle" horizontalAlign="center" height="100%" width="30%">
 			
 			<s:ToggleButton id="humidifierOn" color="white" width="45%" selected="false" click="humidifierOn.selected = true;humidifierOff.selected=false;"
@@ -27,8 +27,8 @@
 		</s:HGroup>
 		<s:Image id="htime" source="assets/duration.png" width="80" height="48"  smooth="true"/>
 		 <mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="30%"    id="hSlider"  
-						 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="true"/>
-		<s:Image   source="assets/delIcon.png" name="hDel" id="myDel"  width="80" height="48"  smooth="true"/>		
+						 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="true"/>
+		<s:Image   source="assets/delIcon.png"  id="myDel"  width="80" height="48"  smooth="true"/>		
 	</s:HGroup>
 	
 </s:Group>

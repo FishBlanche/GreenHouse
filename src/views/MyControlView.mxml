@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark"  destructionPolicy="never" xmlns:mx="library://ns.adobe.com/flex/mx"  backgroundAlpha="0.3" initialize="init()"   creationComplete="create()" >
+		xmlns:s="library://ns.adobe.com/flex/spark"  removedFromStage="remove_Handle()"   xmlns:mx="library://ns.adobe.com/flex/mx"  backgroundAlpha="0.3" initialize="init()"   creationComplete="create()" >
 		<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
 		.itextInput
@@ -15,7 +15,9 @@
 			fontSize: 15;
 		}
 	</fx:Style>
-	
+	<fx:Declarations>
+		<mx:Move   id="btn_move"  yBy="-25" duration="500"/>
+	</fx:Declarations>
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
@@ -34,13 +36,16 @@
 			import spark.components.Group;
 			import spark.managers.PersistenceManager;
 			import spark.skins.mobile.TextInputSkin;
+			import spark.transitions.CrossFadeViewTransition;
 			
+			import components.LoginGroup;
 			import components.MyConditionGroup;
 			import components.MyFanGroup;
 			import components.MyHumiGroup;
 			import components.MyIrriGroup;
 			import components.MyRollerGroup;
 			import components.MyRuleGroup;
+			import components.ServerGroup;
 			
 			import model.ControlGroup;
 			
@@ -54,20 +59,28 @@
 			[Bindable] [Embed (source="assets/myCO.png")] private static var icon_CO:Class;
 			[Bindable] [Embed (source="assets/myCO2.png")] private static var icon_CO2:Class;
 		 
-			private	var dateFormatter:DateFormatter = new DateFormatter();    
-			private	var rg:MyRollerGroup;
-			private	var fg:MyFanGroup;
+			private	var dateFormatter:DateFormatter = new DateFormatter();  
+			
+			private	var rgInner:MyRollerGroup;
+			private	var rgOuter:MyRollerGroup;
+			private	var fgWest:MyFanGroup;
+			private	var fgEast:MyFanGroup;
 			private var hg:MyHumiGroup;
-			private var ig:MyIrriGroup;
+			private var ig1:MyIrriGroup;
+			private var ig2:MyIrriGroup;
+			private var ig3:MyIrriGroup;
+			private var ig4:MyIrriGroup;
+			
 			private var gpCollect:ArrayCollection=new ArrayCollection;
 			private var myAMF:AMFChannel=new AMFChannel();
 			private var channelSet:ChannelSet=new ChannelSet;
 			private var ro:RemoteObject = new RemoteObject();
 			private var ControlRo:RemoteObject = new RemoteObject();
 			private var DelControlRo:RemoteObject = new RemoteObject();
+			 
+			private var AddControlRo:RemoteObject = new RemoteObject();
 			private var DCRo:RemoteObject = new RemoteObject();
 			private var FindRo:RemoteObject = new RemoteObject();
-		 	private var ipReg:RegExp =/^(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|[1-9])\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.(1\d{2}|2[0-4]\d|25[0-5]|[1-9]\d|\d)$/ ;
 			
 			private	var rgDel:MyRuleGroup;
 			private	var rgLook:MyRuleGroup;
@@ -79,67 +92,50 @@
 			private var myMin:Number=-20;
 			[Bindable]
 			private var myMax:Number=70;
-			[Bindable]
-			private var isLogin:Boolean=false;
-			[Bindable]
-			private var isCamera:Boolean=false;
+		 
 			private var InnerMaxRoller:String="";
 			private var InnerMinRoller:String="";
 			private var OuterMaxRoller:String="";
 			private var OuterMinRoller:String="";
+			private	var login:LoginGroup;
+			private var	loginShow:Boolean=false;
+			private	var connectGp:ServerGroup;
+			private var	connectShow:Boolean=false;
+			private function remove_Handle():void
+			{
+				if(login&&loginShow)
+				{
+					this.removeElement(login);
+					login=null;
+				}
+				
+			}
 			private  function init():void{
+				scrllr1.addEventListener(MouseEvent.MOUSE_DOWN,down_handle);
+			
 				if(AccessServer())
 				{
 					FindRo.findControInfo();
 				}
 			}
+			private function down_handle(evt:MouseEvent):void
+			{
+				if(login&&loginShow)
+				{
+					this.removeElement(login);
+					loginShow=false;
+				}
+				if(connectGp&&connectShow)
+				{
+					this.removeElement(connectGp);
+					connectShow=false;
+				}
+				
+			}
 			private  function create():void{
-				uname.addEventListener(FlexEvent.ENTER,enter_submit);
-				upass.addEventListener(FlexEvent.ENTER,enter_submit);
 				 
-				var persistencemanager:PersistenceManager=new PersistenceManager();
-				if(persistencemanager.load())
-				{
-					if(persistencemanager.getProperty("uname"))
-					{
-						uname.text=persistencemanager.getProperty("uname").toString();
-					}
-					if(persistencemanager.getProperty("upword"))
-					{
-						upass.text=persistencemanager.getProperty("upword").toString();
-					}
-					 
-				}
 			}
-			private function enter_submit(event:FlexEvent):void{
-				lmessage.text="";
-				if(StringUtil.trim(uname.text)!=""&&StringUtil.trim(upass.text)!="")
-				{
-					var persistencemanager:PersistenceManager=new PersistenceManager();
-					if(persistencemanager.load())
-					{
-						persistencemanager.setProperty("uname",uname.text);
-						persistencemanager.setProperty("upword",upass.text);
-						persistencemanager.save();
-						if(persistencemanager.getProperty("serverAddress"))
-						{
-							myAMF.url=persistencemanager.getProperty("serverAddress").toString();
-							channelSet.addChannel(myAMF); 
-							ro.channelSet = channelSet;
-							ro.destination="UserService";//验证用户身份
-							ro.addEventListener(ResultEvent.RESULT,result_handler);
-							ro.addEventListener(FaultEvent.FAULT,faultHandle);
-							lmessage.text="正在登录----";
-							isLogin=false;
-							ro.queryUser(uname.text,upass.text);//请求服务端对用户的身份验证
-						}
-						else
-						{
-							lmessage.text="服务器地址未知";
-						}
-					}
-				}
-			}
+		 
 		 
 			private  function AutoControl_handler(e:ResultEvent):void{
 				lmessage.text="";
@@ -159,10 +155,12 @@
 						lmessage.text="添加成功";
 						var cg:ControlGroup=new ControlGroup;
 						cg.gpId=rs[0];
-						cg.gpValue=rs[1]+";"+rs[2]+";"+rs[3];
+						cg.gpValue=rs[1]+";"+rs[2]+";"+rs[3]+";"+rs[4];
+					 
 						gpCollect.addItem(cg);
 						gpCollect.refresh();
 					}
+				 
 					else
 					{
 						lmessage.text="修改成功";
@@ -170,7 +168,7 @@
 						{
 							if(gpCollect.getItemAt(i).gpId==rs[0])
 							{
-								gpCollect.getItemAt(i).gpValue=rs[1]+";"+rs[2]+";"+rs[3];
+								gpCollect.getItemAt(i).gpValue=rs[1]+";"+rs[2]+";"+rs[3]+";"+rs[4];
 							}
 						}
 					}
@@ -219,29 +217,12 @@
 					lmessage.text="设置成功";
 				}
 			}
+		 
 			private  function findControlInfo_handler(e:ResultEvent):void{
-				//trace("findControlInfo_handler");
-				gpCollect.removeAll();
-				gpCollect=e.result as ArrayCollection;
+				 gpCollect.removeAll();
+				 gpCollect=e.result as ArrayCollection;
+			}
 			 
-				//trace("gpCollect.length"+gpCollect.length);
-				
-			}
-			private  function result_handler(e:ResultEvent):void{
-				lmessage.text="";
-				FlexGlobals.topLevelApplication.currentUser="";
-				if(e.result!="")
-				{
-					var a:String=StringUtil.trim(e.result.toString());
-					FlexGlobals.topLevelApplication.currentUser=a;
-					lmessage.text="登录成功";
-					trace("currentUser"+a);
-				}
-				else
-				{
-					lmessage.text="该用户不存在";
-				}
-			}
 			private  function  faultHandle(event:FaultEvent):void
 			{ 
 				trace(" request error");
@@ -276,6 +257,8 @@
 						DelControlRo.destination="DelControlService";//验证用户身份
 						DelControlRo.addEventListener(ResultEvent.RESULT,DelControl_handler);
 						DelControlRo.addEventListener(FaultEvent.FAULT,faultHandle);
+					 
+					 
 						return true;
 					}
 					else
@@ -292,14 +275,8 @@
 					return false;
 				}
 			}
-			private  function show_Camera():void{
-				lmessage.text="";
-				isCamera=true;
-			}
-			private  function show_LoginWindow():void{
-				lmessage.text="";
-				isLogin=true;
-			}
+			 
+		 
 			private function TypeChange(type:int,e:MouseEvent):void//选择传感器
 			{
 				mySensorType=type;//设置各个传感器的滑竿范围
@@ -359,7 +336,7 @@
 				(e.currentTarget as Image).alpha=1;
 				ve.mySlider.minimum=myMin;
 				ve.mySlider.maximum=myMax;
-				ve.width=this.width;
+				ve.width=this.width*0.9;
 				ve.height=this.height*0.15;
 				ve.myDel.addEventListener(MouseEvent.CLICK,conditionDel_Handle);
 				vg.addElementAt(ve,vg.numChildren-1);
@@ -371,49 +348,120 @@
 			}
 			private  function  mdgImg_Handle(evt:MouseEvent):void//选择设备
 			{
-				myRoller.alpha=0.3;
-				myFan.alpha=0.3;
+				innerRoller.alpha=0.3;
+				outerRoller.alpha=0.3;
 				myHumi.alpha=0.3;
-				myIrri.alpha=0.3;
+				westFan.alpha=0.3;
+				eastFan.alpha=0.3;
+				Irri1.alpha=0.3;
+				Irri2.alpha=0.3;
+				Irri3.alpha=0.3;
+				Irri4.alpha=0.3;
 				(evt.currentTarget as Image).alpha=1;
 				switch((evt.currentTarget as Image).id)
 				{
-					case "myRoller":if(!rg)  
+					case "innerRoller":if(!rgInner)  
 					{
-						rg=new MyRollerGroup;
-						rg.width=this.width;
-						rg.height=this.height*0.15;
-						rg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
-					    vg2.addElementAt(rg,vg2.numChildren-1);
+						rgInner=new MyRollerGroup;
+						rgInner.width=this.width*0.9;
+						rgInner.height=this.height*0.15;
+						rgInner.roller.source="assets/innerRoller.png";
+						rgInner.myDel.name="rgInnerDel";
+						rgInner.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+					    vg2.addElementAt(rgInner,vg2.numChildren-1);
 					}
 						break;
-					case "myFan": if(!fg)
+					case "outerRoller":if(!rgOuter)  
 					{
-						fg=new MyFanGroup;
-						fg.width=this.width;
-						fg.height=this.height*0.15;
-						fg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
-						vg2.addElementAt(fg,vg2.numChildren-1);
+						rgOuter=new MyRollerGroup;
+						rgOuter.width=this.width*0.9;
+						rgOuter.roller.source="assets/outerRoller.png";
+						rgOuter.height=this.height*0.15;
+						rgOuter.myDel.name="rgOuterDel";
+						rgOuter.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(rgOuter,vg2.numChildren-1);
+					}
+						break;
+					case "westFan": if(!fgWest)
+					{
+						
+						fgWest=new MyFanGroup;
+						fgWest.width=this.width*0.9;
+						fgWest.height=this.height*0.15;
+						fgWest.fan.source="assets/westFan.png";
+						fgWest.myDel.name="fgWestDel";
+						fgWest.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(fgWest,vg2.numChildren-1);
+					}
+						break;
+					case "eastFan": if(!fgEast)
+					{
+						
+						fgEast=new MyFanGroup;
+						fgEast.width=this.width*0.9;
+						fgEast.height=this.height*0.15;
+						fgEast.fan.source="assets/eastFan.png";
+						fgEast.myDel.name="fgEastDel";
+						fgEast.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(fgEast,vg2.numChildren-1);
 					}
 						break;
 					case "myHumi": if(!hg)
 					{
 						hg=new MyHumiGroup;
-						hg.width=this.width;
+						hg.width=this.width*0.9;
 						hg.height=this.height*0.15;
+						hg.humidifier.source="assets/myHumi.png"
+						hg.myDel.name="hgDel";
 						hg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
 						vg2.addElementAt(hg,vg2.numChildren-1);
 					}
 						break;
-					case "myIrri": if(!ig)
+					case "Irri1": if(!ig1)
 					{
-						ig=new MyIrriGroup;
-						ig.width=this.width;
-						ig.height=this.height*0.15;
-						ig.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
-						vg2.addElementAt(ig,vg2.numChildren-1);
+						ig1=new MyIrriGroup;
+						ig1.width=this.width*0.9;
+						ig1.height=this.height*0.15;
+						ig1.irrigation.source= "assets/Irri1.png";
+						ig1.myDel.name="ig1Del";
+							
+						ig1.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(ig1,vg2.numChildren-1);
 					}
 					break;
+					case "Irri2": if(!ig2)
+					{
+						ig2=new MyIrriGroup;
+						ig2.width=this.width*0.9;
+						ig2.height=this.height*0.15;
+						ig2.irrigation.source="assets/Irri2.png";
+						ig2.myDel.name="ig2Del";
+						ig2.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(ig2,vg2.numChildren-1);
+					}
+						break;
+					case "Irri3": if(!ig3)
+					{
+						ig3=new MyIrriGroup;
+						ig3.width=this.width*0.9;
+						ig3.height=this.height*0.15;
+						ig3.irrigation.source="assets/Irri3.png";
+						ig3.myDel.name="ig3Del";
+						ig3.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(ig3,vg2.numChildren-1);
+					}
+						break;
+					case "Irri4": if(!ig4)
+					{
+						ig4=new MyIrriGroup;
+						ig4.width=this.width*0.9;
+						ig4.height=this.height*0.15;
+						ig4.irrigation.source="assets/Irri4.png";
+						ig4.myDel.name="ig4Del";
+						ig4.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+						vg2.addElementAt(ig4,vg2.numChildren-1);
+					}
+						break;
 					default:break;
 				}
 				if(vg2.numChildren>3)
@@ -434,8 +482,7 @@
 					var a:int=autovg.numChildren-1;
 					while(a>0)
 					{
-						
-						autovg.removeElementAt(0);
+					    autovg.removeElementAt(0);
 						a--;
 					}
 				}
@@ -445,7 +492,7 @@
 				var valueArr:Array;
 				for(var i:int=0;i<gpCollect.length;i++)
 				{
-					trace(gpCollect.getItemAt(i).gpId+","+gpCollect.getItemAt(i).gpValue);
+				//	trace(gpCollect.getItemAt(i).gpId+","+gpCollect.getItemAt(i).gpValue);
 					valueArr=String(gpCollect.getItemAt(i).gpValue).split(";");
 					var rgp:MyRuleGroup=new MyRuleGroup;
 					rgp.width=this.width*0.8;
@@ -454,6 +501,18 @@
 					rgp.rulebtn.label="点击查看";
 					rgp.rulebtn.addEventListener(MouseEvent.CLICK,look_Handle);
 					rgp.myTime.text = valueArr[2]; 
+					if(int(valueArr[3])==0)
+					{
+						rgp.On.selected=true;
+						rgp.Off.selected=false;
+					}
+					else
+					{
+						rgp.On.selected=false;
+						rgp.Off.selected=true;
+					}
+					rgp.On.addEventListener(MouseEvent.CLICK,RuleOC1_Handle);
+					rgp.Off.addEventListener(MouseEvent.CLICK,RuleOC2_Handle);
 					rgp.myRuleDel.addEventListener(MouseEvent.CLICK,RuleDel_Handle);
 					autovg.addElementAt(rgp,autovg.numChildren-1);
 				}
@@ -464,6 +523,56 @@
 			    rgLook=((evt.currentTarget as Button).parent.parent) as MyRuleGroup;
 				this.currentState="condition";
 		        ConditionView();
+			}
+			private  function  RuleOC1_Handle(evt:MouseEvent):void
+			{ 
+				
+				//	autovg.removeElement(((evt.currentTarget as Image).parent.parent) as Group);
+			    var	rg:MyRuleGroup=((evt.currentTarget as ToggleButton).parent.parent.parent) as MyRuleGroup;
+				var ocgp:String="";
+				for(var i:int=0;i<gpCollect.length;i++)
+				{
+					if(gpCollect.getItemAt(i).gpId==rg.rulebtn.name)
+					{
+						//gpCollect.removeItemAt(i);
+					    var	valueArr:Array=String(gpCollect.getItemAt(i).gpValue).split(";");
+						gpCollect.getItemAt(i).gpValue=valueArr[0]+";"+valueArr[1]+";"+valueArr[2]+";"+0;
+						ocgp=gpCollect.getItemAt(i).gpId+";"+gpCollect.getItemAt(i).gpValue;
+						trace("RuleOC_Handle"+ocgp);
+						break;
+					}
+				}
+				if(AccessServer())
+				{
+					lmessage.text="正在处理----";
+					setType="开关";
+					ControlRo.ControlSet(ocgp,FlexGlobals.topLevelApplication.currentUser);
+				}
+			}
+			private  function  RuleOC2_Handle(evt:MouseEvent):void
+			{ 
+				
+				//	autovg.removeElement(((evt.currentTarget as Image).parent.parent) as Group);
+				var	rg:MyRuleGroup=((evt.currentTarget as ToggleButton).parent.parent.parent) as MyRuleGroup;
+				var ocgp:String="";
+				for(var i:int=0;i<gpCollect.length;i++)
+				{
+					if(gpCollect.getItemAt(i).gpId==rg.rulebtn.name)
+					{
+						//gpCollect.removeItemAt(i);
+						var	valueArr:Array=String(gpCollect.getItemAt(i).gpValue).split(";");
+						gpCollect.getItemAt(i).gpValue=valueArr[0]+";"+valueArr[1]+";"+valueArr[2]+";"+1;
+						ocgp=gpCollect.getItemAt(i).gpId+";"+gpCollect.getItemAt(i).gpValue;
+						trace("RuleOC_Handle"+ocgp);
+						break;
+					}
+				}
+				if(AccessServer())
+				{
+					lmessage.text="正在处理----";
+					setType="开关";
+					ControlRo.ControlSet(ocgp,FlexGlobals.topLevelApplication.currentUser);
+				}
 			}
 			private  function  RuleDel_Handle(evt:MouseEvent):void
 			{ 
@@ -490,18 +599,33 @@
 				vg2.removeElement(((evt.currentTarget as Image).parent.parent) as Group);
 				switch((evt.currentTarget as Image).name)
 				{
-					case "rDel":rg.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
-						rg=null;
+					case "rgInnerDel":rgInner.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						rgInner=null;
 						break;
-					case "fDel": fg.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
-						fg=null;
+					case "rgOuterDel": rgOuter.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						rgOuter=null;
 						break;
-					case "hDel":hg.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+					case "fgWestDel":fgWest.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						fgWest=null;
+						break;
+					case "fgEastDel":fgEast.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						fgEast=null;
+					     break;
+					case "hgDel":hg.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
 						hg=null;
 						break;
-					case "iDel":ig.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
-						ig=null;
-					     break;
+					case "ig1Del":ig1.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						ig1=null;
+						break;
+					case "ig2Del":ig2.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						ig2=null;
+						break;
+					case "ig3Del":ig3.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						ig3=null;
+						break;
+					case "ig4Del":ig4.myDel.removeEventListener(MouseEvent.CLICK,controlDel_Handle);
+						ig4=null;
+						break;
 					default:break;
 				}
 				if(vg2.numChildren<=3)
@@ -550,7 +674,8 @@
 						mySetting.enabled=false;
 					}
 				}
-				rg=null;fg=null;ig=null;hg=null;
+				rgInner=null;rgOuter=null;fgWest=null;fgEast=null;
+				ig1=null;ig2=null;ig3=null;ig4=null;hg=null;
 			}
 		
 			private  function before2Click():void
@@ -559,7 +684,6 @@
 			}
 			private  function ConditionView():void
 			{ 
-				
 				if(rgLook)
 				{
 					var lookgp:Array;
@@ -682,7 +806,8 @@
 						mySetting.enabled=false;
 					}
 				}
-				rg=null;fg=null;ig=null;hg=null;
+				rgInner=null;rgOuter=null;fgWest=null;fgEast=null;
+				ig1=null;ig2=null;ig3=null;ig4=null;hg=null;
 				this.currentState="device";
 				if(rgLook)
 				{
@@ -701,93 +826,176 @@
 							{
 								
 								ruleArr=String(rulegp[j]).split(",");
-								switch(ruleArr[0])//设备的类型
+								switch(ruleArr[1])//设备的类型
 								{
-									case "4": rg=new MyRollerGroup;
-										       switch(ruleArr[1])
-											   {
-												      case "8":rg.iroller.selected=true;
-														       rg.oroller.selected=false;
-														       break;
-													  case "9":rg.iroller.selected=false;
-														  rg.oroller.selected=true;
-														      break;
-													  default:break;
-										       }
-											   switch(ruleArr[2])
-											   {
-												   case "0":rg.rollerOn.selected=true;rg.rollerOff.selected=false;rg.rollerRet.selected =false;
-													       break;
-												   case "1":rg.rollerOff.selected = true;rg.rollerOn.selected=false;rg.rollerRet.selected =false;
-													       break;
-												   case "2":rg.rollerRet.selected = true;rg.rollerOff.selected=false;rg.rollerOn.selected=false;
-													       break;
-												   default:break;
-											   }
-											   rg.rSlider.value=Number(ruleArr[3])/60;
-											   rg.width=this.width;
-											   rg.height=this.height*0.15;
-											   rg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
-											   vg2.addElementAt(rg,vg2.numChildren-1);
-										       break;
-									case "2":fg=new MyFanGroup;
-										     switch(ruleArr[2])
-										     {
-											   case "0":fg.fanOn.selected = true;fg.fanOff.selected=false;
-												break;
-											   case "1":fg.fanOff.selected = true;fg.fanOn.selected=false;
-												break;
-											   default:break;
-										     }
-											 fg.fSlider.value=Number(ruleArr[3])/60;
-											 fg.width=this.width;
-											 fg.height=this.height*0.15;
-											 fg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
-											 vg2.addElementAt(fg,vg2.numChildren-1);
-										      break;
-									case "3":hg=new MyHumiGroup;
-										     switch(ruleArr[2])
-										     {
-										    	case "0":hg.humidifierOn.selected = true;hg.humidifierOff.selected=false;
-												break;
-											    case "1":hg.humidifierOff.selected = true;hg.humidifierOn.selected=false;
-												break;
-											   default:break;
-										     }
-											 hg.hSlider.value =Number(ruleArr[3])/60;
-											 hg.width=this.width;
-											 hg.height=this.height*0.15;
-											 hg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
-											 vg2.addElementAt(hg,vg2.numChildren-1);
-										      break;
-									case "1": ig=new MyIrriGroup;
-										switch(ruleArr[1])
-										{
-											case "1": ig.water1.selected = true;ig.water2.selected=false;ig.water3.selected=false;ig.water4.selected=false;
-											     	break;
-											case "2": ig.water2.selected = true;ig.water1.selected=false;ig.water3.selected=false;ig.water4.selected=false;
-												   break;
-											case "3": ig.water3.selected = true;ig.water1.selected=false;ig.water2.selected=false;ig.water4.selected=false;
-												    break;
-											case "4": ig.water4.selected = true; ig.water1.selected=false; ig.water2.selected=false; ig.water3.selected=false;
-												    break;
-											default:break;
-										}
+										case "1": ig1=new MyIrriGroup;
+										
 										switch(ruleArr[2])
 										{
-											case "0": ig.waterOn.selected = true;ig.waterOff.selected=false;
+											case "0": ig1.waterOn.selected = true;ig1.waterOff.selected=false;
 												break;
-											case "1": ig.waterOff.selected = true;ig.waterOn.selected=false;
+											case "1": ig1.waterOff.selected = true;ig1.waterOn.selected=false;
+												break;
+											
+											default:break;
+										}
+										ig1.iSlider.value=Number(ruleArr[3])/60;
+										ig1.width=this.width*0.9;
+										ig1.height=this.height*0.15;
+										ig1.irrigation.source= "assets/Irri1.png";
+										ig1.myDel.name="ig1Del";
+										ig1.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(ig1,vg2.numChildren-1);
+										break;
+									case "2": ig2=new MyIrriGroup;
+										
+										switch(ruleArr[2])
+										{
+											case "0": ig2.waterOn.selected = true;ig2.waterOff.selected=false;
+												break;
+											case "1": ig2.waterOff.selected = true;ig2.waterOn.selected=false;
+												break;
+											
+											default:break;
+										}
+										ig2.iSlider.value=Number(ruleArr[3])/60;
+										ig2.width=this.width*0.9;
+										ig2.height=this.height*0.15;
+										ig2.irrigation.source="assets/Irri2.png";
+										ig2.myDel.name="ig2Del";
+										ig2.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(ig2,vg2.numChildren-1);
+										break;
+									case "3": ig3=new MyIrriGroup;
+										
+										switch(ruleArr[2])
+										{
+											case "0": ig3.waterOn.selected = true;ig3.waterOff.selected=false;
+												break;
+											case "1": ig3.waterOff.selected = true;ig3.waterOn.selected=false;
+												break;
+											
+											default:break;
+										}
+										ig3.iSlider.value=Number(ruleArr[3])/60;
+										ig3.width=this.width*0.9;
+										ig3.height=this.height*0.15;
+										ig3.irrigation.source="assets/Irri3.png";
+										ig3.myDel.name="ig3Del";
+										ig3.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(ig3,vg2.numChildren-1);
+										break;
+									case "4": ig4=new MyIrriGroup;
+										 
+										switch(ruleArr[2])
+										{
+											case "0": ig4.waterOn.selected = true;ig4.waterOff.selected=false;
+												break;
+											case "1": ig4.waterOff.selected = true;ig4.waterOn.selected=false;
 												break;
 											 
 											default:break;
 										}
-										ig.iSlider.value=Number(ruleArr[3])/60;
-										ig.width=this.width;
-										ig.height=this.height*0.15;
-										ig.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
-										vg2.addElementAt(ig,vg2.numChildren-1);
+										ig4.iSlider.value=Number(ruleArr[3])/60;
+										ig4.irrigation.source="assets/Irri4.png";
+										ig4.width=this.width*0.9;
+										ig4.height=this.height*0.15;
+										ig4.myDel.name="ig4Del";
+										ig4.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(ig4,vg2.numChildren-1);
 										    break;
+									case "5":fgWest=new MyFanGroup;
+										switch(ruleArr[2])
+										{
+											case "0":fgWest.fanOn.selected = true;fgWest.fanOff.selected=false;
+												break;
+											case "1":fgWest.fanOff.selected = true;fgWest.fanOn.selected=false;
+												break;
+											default:break;
+										}
+										fgWest.fSlider.value=Number(ruleArr[3])/60;
+										fgWest.width=this.width*0.9;
+										fgWest.height=this.height*0.15;
+										fgWest.fan.source="assets/westFan.png";
+										fgWest.myDel.name="fgWestDel";
+										fgWest.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(fgWest,vg2.numChildren-1);
+										break;
+									case "6":fgEast=new MyFanGroup;
+										switch(ruleArr[2])
+										{
+											case "0":fgEast.fanOn.selected = true;fgEast.fanOff.selected=false;
+												break;
+											case "1":fgEast.fanOff.selected = true;fgEast.fanOn.selected=false;
+												break;
+											default:break;
+										}
+										fgEast.fSlider.value=Number(ruleArr[3])/60;
+										fgEast.width=this.width*0.9;
+										fgEast.height=this.height*0.15;
+										fgEast.fan.source="assets/eastFan.png";
+										fgEast.myDel.name="fgEastDel";
+										fgEast.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(fgEast,vg2.numChildren-1);
+										break;
+									case "7":hg=new MyHumiGroup;
+										switch(ruleArr[2])
+										{
+											case "0":hg.humidifierOn.selected = true;hg.humidifierOff.selected=false;
+												break;
+											case "1":hg.humidifierOff.selected = true;hg.humidifierOn.selected=false;
+												break;
+											default:break;
+										}
+										hg.hSlider.value =Number(ruleArr[3])/60;
+										hg.width=this.width*0.9;
+										hg.height=this.height*0.15;
+										hg.humidifier.source="assets/myHumi.png"
+										hg.myDel.name="hgDel";
+										hg.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(hg,vg2.numChildren-1);
+										break;
+									case "8": rgInner=new MyRollerGroup;
+										 
+										switch(ruleArr[2])
+										{
+											case "0":rgInner.rollerOn.selected=true;rgInner.rollerOff.selected=false;rgInner.rollerRet.selected =false;
+												break;
+											case "1":rgInner.rollerOff.selected = true;rgInner.rollerOn.selected=false;rgInner.rollerRet.selected =false;
+												break;
+											case "2":rgInner.rollerRet.selected = true;rgInner.rollerOff.selected=false;rgInner.rollerOn.selected=false;
+												break;
+											default:break;
+										}
+										rgInner.rSlider.value=Number(ruleArr[3])/60;
+										rgInner.width=this.width*0.9;
+										rgInner.height=this.height*0.15;
+										rgInner.roller.source="assets/innerRoller.png";
+										rgInner.myDel.name="rgInnerDel";
+										rgInner.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(rgInner,vg2.numChildren-1);
+										break;
+									case "9": rgOuter=new MyRollerGroup;
+										
+										switch(ruleArr[2])
+										{
+											case "0":rgOuter.rollerOn.selected=true;rgOuter.rollerOff.selected=false;rgOuter.rollerRet.selected =false;
+												break;
+											case "1":rgOuter.rollerOff.selected = true;rgOuter.rollerOn.selected=false;rgOuter.rollerRet.selected =false;
+												break;
+											case "2":rgOuter.rollerRet.selected = true;rgOuter.rollerOff.selected=false;rgOuter.rollerOn.selected=false;
+												break;
+											default:break;
+										}
+										rgOuter.rSlider.value=Number(ruleArr[3])/60;
+										rgOuter.width=this.width*0.9;
+										rgOuter.height=this.height*0.15;
+										rgOuter.roller.source="assets/outerRoller.png";
+										rgOuter.myDel.name="rgOuterDel";
+										rgOuter.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
+										vg2.addElementAt(rgOuter,vg2.numChildren-1);
+										break;
+									
 									default:break;
 								}
 							}
@@ -856,44 +1064,80 @@
 					 }
 				 }
 				 gpStr+=";";
-				 if(rg)
+				 if(rgInner)
 				 {
 					 gpStr+="4,";
-					 if(rg.iroller.selected)
-					 {
-						 gpStr+="8,";
-					 }
-					 else
-					 {
-						 gpStr+="9,";
-					 }
-					 if(rg.rollerOn.selected)
+					  gpStr+="8,";
+					 if(rgInner.rollerOn.selected)
 					 {
 						 gpStr+="0,";
+						 gpStr+=rgInner.rSlider.value*60;
 					 }
-					 else if(rg.rollerOff.selected)
+					 else if(rgInner.rollerOff.selected)
 					 {
 						 gpStr+="1,";
+						 gpStr+=0;
 					 }
 					 else
 					 {
 						 gpStr+="2,";
+						 gpStr+=rgInner.rSlider.value*60;
 					 }
-					 gpStr+=rg.rSlider.value*60;
 					 gpStr+="a";
 				 }
-				 if(fg)
+				 if(rgOuter)
 				 {
-					 gpStr+="2,5,";
-					 if(fg.fanOn.selected)
+					 gpStr+="4,";
+					 gpStr+="9,";
+					 if(rgOuter.rollerOn.selected)
 					 {
 						 gpStr+="0,";
+						 gpStr+=rgOuter.rSlider.value*60;
+					 }
+					 else if(rgOuter.rollerOff.selected)
+					 {
+						 gpStr+="1,";
+						 gpStr+=0;
+					 }
+					 else
+					 {
+						 gpStr+="2,";
+						 gpStr+=rgOuter.rSlider.value*60;
+					 }
+					 gpStr+="a";
+				 }
+				 if(fgWest)
+				 {
+					 gpStr+="2,";
+					 gpStr+="5,";
+					 if(fgWest.fanOn.selected)
+					 {
+						 gpStr+="0,";
+						 gpStr+=fgWest.fSlider.value*60;
 					 }
 					 else
 					 {
 						 gpStr+="1,";
+						 gpStr+=0;
 					 }
-					 gpStr+=fg.fSlider.value*60;
+					
+					 gpStr+="a";
+				 }
+				 if(fgEast)
+				 {
+					 gpStr+="2,";
+					 gpStr+="6,";
+					 if(fgEast.fanOn.selected)
+					 {
+						 gpStr+="0,";
+						 gpStr+=fgEast.fSlider.value*60;
+					 }
+					 else
+					 {
+						 gpStr+="1,";
+						 gpStr+=0;
+					 }
+					 
 					 gpStr+="a";
 				 }
 				 if(hg)
@@ -902,46 +1146,87 @@
 					 if(hg.humidifierOn.selected)
 					 {
 						 gpStr+="0,";
+						 gpStr+=hg.hSlider.value*60;
 					 }
 					 else
 					 {
 						 gpStr+="1,";
+						 gpStr+=0;
 					 }
-					 gpStr+=hg.hSlider.value*60;
+					 
 					 gpStr+="a";
 				 }
-				 if(ig)
+				 if(ig1)
 				 {
 					 gpStr+="1,";//类型
-					 if(ig.water1.selected)//编号
-					 {
-						 gpStr+="1,";
-					 }
-					 else if(ig.water2.selected)
-					 {
-						 gpStr+="2,";
-					 }
-					 else if(ig.water3.selected)
-					 {
-						 gpStr+="3,";
-					 }
-					 else
-					 {
-						 gpStr+="4,";
-					 }
-					 if(ig.waterOn.selected)
+				    gpStr+="1,";
+					if(ig1.waterOn.selected)
 					 {
 						 gpStr+="0,";
+						 gpStr+=ig1.iSlider.value*60;
 					 }
 					 else
 					 {
 						 gpStr+="1,";
+						 gpStr+=0;
 					 }
-					 gpStr+=ig.iSlider.value*60;
+					
+					 gpStr+="a";
+				 }
+				 if(ig2)
+				 {
+					 gpStr+="1,";//类型
+					 gpStr+="2,";
+					  if(ig2.waterOn.selected)
+					 {
+						 gpStr+="0,";
+						 gpStr+=ig2.iSlider.value*60;
+					 }
+					 else
+					 {
+						 gpStr+="1,";
+						 gpStr+=0;
+					 }
+					 
+					 gpStr+="a";
+				 }
+				 if(ig3)
+				 {
+					 gpStr+="1,";//类型
+					 gpStr+="3,";
+					 if(ig3.waterOn.selected)
+					 {
+						 gpStr+="0,";
+						 gpStr+=ig3.iSlider.value*60;
+					 }
+					 else
+					 {
+						 gpStr+="1,";
+						 gpStr+=0;
+					 }
+					 
+					 gpStr+="a";
+				 }
+				 if(ig4)
+				 {
+					 gpStr+="1,";//类型
+					 gpStr+="4,";
+					 if(ig4.waterOn.selected)
+					 {
+						 gpStr+="0,";
+						 gpStr+=ig4.iSlider.value*60;
+					 }
+					 else
+					 {
+						 gpStr+="1,";
+						 gpStr+=0;
+					 }
+					 
 					 gpStr+="a";
 				 }
 				 gpStr=gpStr.substr(0,gpStr.length-1);
 				 gpStr+=";"+time;
+				 gpStr+=";"+1;//条件默认是关闭，1关，0开
 				 trace("添加或设置"+gpStr);
 				if(AccessServer())
 				{
@@ -949,10 +1234,12 @@
 					ControlRo.ControlSet(gpStr,FlexGlobals.topLevelApplication.currentUser);
 				}
 			}
-			private  function  roller_set():void
+			private  function  roller_set(evt:MouseEvent):void
 			{ 
 				trace("roller_set()");
 				lmessage.text="";
+				btn_move.target=evt.currentTarget;
+				btn_move.play();
 				if(AccessServer())
 				{
 					if(roller1.selected)
@@ -963,7 +1250,7 @@
 						}
 						else if(rollerOff.selected)
 						{
-							DCRo.operation(4,8,iSlider1.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,8,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(rollerRet.selected)
 						{
@@ -982,7 +1269,7 @@
 						}
 						else if(rollerOff.selected)
 						{
-							DCRo.operation(4,9,iSlider1.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,9,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(rollerRet.selected)
 						{
@@ -999,10 +1286,12 @@
 					}
 				}
 			}
-			private  function  fan_set():void
+			private  function  fan_set(evt:MouseEvent):void
 			{ 
 				trace("fan_set()");
 				lmessage.text="";
+				btn_move.target=evt.currentTarget;
+				btn_move.play();
 				if(AccessServer())
 				{
 					if(fan1.selected)
@@ -1013,7 +1302,7 @@
 						}
 						else if(fanOff.selected)
 						{
-							DCRo.operation(2,5,iSlider2.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(2,5,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1028,7 +1317,7 @@
 						}
 						else if(fanOff.selected)
 						{
-							DCRo.operation(2,6,iSlider2.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(2,6,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1041,10 +1330,12 @@
 					}
 				}
 			}
-			private  function  humidifier_set():void
+			private  function  humidifier_set(evt:MouseEvent):void
 			{ 
 				trace("humidifier_set()");
 				lmessage.text="";
+				btn_move.target=evt.currentTarget;
+				btn_move.play();
 				if(AccessServer())
 				{
 					if(humidifierOn.selected)
@@ -1053,7 +1344,7 @@
 					}
 					else if(humidifierOff.selected)
 					{
-						DCRo.operation(3,7,iSlider3.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+						DCRo.operation(3,7,0,1,FlexGlobals.topLevelApplication.currentUser);
 					}
 					else
 					{
@@ -1061,11 +1352,13 @@
 					}
 				}
 			}
-			private  function  irrigation_set():void
+			private  function  irrigation_set(evt:MouseEvent):void
 			{ 
 				trace("irrigation_set()");
 				
 				lmessage.text="";
+				btn_move.target=evt.currentTarget;
+				btn_move.play();
 				if(AccessServer())
 				{
 					if(water1.selected)
@@ -1076,7 +1369,7 @@
 						}
 						else if(waterOff.selected)
 						{
-							DCRo.operation(1,1,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,1,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1091,7 +1384,7 @@
 						}
 						else if(waterOff.selected)
 						{
-							DCRo.operation(1,2,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,2,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1106,7 +1399,7 @@
 						}
 						else if(waterOff.selected)
 						{
-							DCRo.operation(1,3,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,3,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1121,7 +1414,7 @@
 						}
 						else if(waterOff.selected)
 						{
-							DCRo.operation(1,4,iSlider4.value*60,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,4,0,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1134,6 +1427,74 @@
 					}
 				}
 			}
+			private function data_view():void
+			{
+				var cross:CrossFadeViewTransition=new CrossFadeViewTransition;
+				cross.duration=200;
+				navigator.pushView(views.GreenHouseView,null,null,cross);
+			}
+			private function resize_app():void
+			{
+				if(!FlexGlobals.topLevelApplication.isMax)
+				{
+					NativeApplication.nativeApplication.activeWindow.maximize();
+					FlexGlobals.topLevelApplication.isMax=true;
+				}
+				else
+				{
+					NativeApplication.nativeApplication.activeWindow.width=1024;
+					NativeApplication.nativeApplication.activeWindow.height=768;
+					FlexGlobals.topLevelApplication.isMax=false;
+				}
+			}
+			private function close_app():void
+			{
+				NativeApplication.nativeApplication.exit();//退出
+			}
+			private function show_login(evt:MouseEvent):void
+			{
+				if(connectGp&&connectShow)
+				{
+					this.removeElement(connectGp);
+					connectShow=false;
+				}
+				if(!login)
+				{
+					login=new LoginGroup;
+				}
+				login.width=210;
+				login.height=100;
+				login.x=evt.stageX-120;
+				login.y=evt.stageY-15;
+				this.addElement(login);
+				loginShow=true;
+			}
+			private function show_connect(evt:MouseEvent):void
+			{
+				if(login&&loginShow)
+				{
+					this.removeElement(login);
+					loginShow=false;
+				}
+				if(!connectGp)
+				{
+					connectGp=new  ServerGroup;
+				}
+				connectGp.width=210;
+				connectGp.height=100;
+				connectGp.x=evt.stageX-120;
+				connectGp.y=evt.stageY-15;
+				this.addElement(connectGp);
+				connectShow=true;
+			}
+			private function scrllr_create():void
+			{
+				scrllr.addEventListener(MouseEvent.MOUSE_DOWN,down_handle);
+			}
+			private function scrllr2_create():void
+			{
+				scrllr2.addEventListener(MouseEvent.MOUSE_DOWN,down_handle);
+			}
 		]]>
 	</fx:Script>
 	<s:states>
@@ -1143,33 +1504,44 @@
 		<s:State name="device" />
 	</s:states>
 	<s:navigationContent>
-		<s:HGroup includeInLayout="{isLogin}" visible="{isLogin}"  horizontalAlign="center" width="100%" height="100%" verticalCenter="0" verticalAlign="middle">
-			<s:Label  text="用户名" fontSize="25"  horizontalCenter="0" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
-			<s:TextInput styleName="itextInput" color="haloblue" verticalCenter="0" width="30%"    height="80%"  id="uname"  prompt="用户名"  skinClass="spark.skins.mobile.TextInputSkin" />
-			<s:Spacer width="5%"/>
-			<s:Label fontSize="25" text="密码" verticalCenter="0" verticalAlign="middle" height="90%" color="halogreen"/>
-			<s:TextInput styleName="itextInput" displayAsPassword="true" color="haloblue" horizontalCenter="0"   verticalCenter="0" width="30%"    height="80%"  id="upass"  prompt="密码"  skinClass="spark.skins.mobile.TextInputSkin" />
-		</s:HGroup>
-		 
+		<s:Spacer width="25"/>
+		<s:Image id="historyshow" click="data_view()" source="assets/history_btn.png"     smooth="true" />
+		<s:Image id="splitshow" source="@Embed('assets/split.png')"     smooth="true" />
+		<s:Image id="controlshow" 	source="assets/control_active.png"     smooth="true" />  
+		
+		
 	</s:navigationContent>
+	 
 	<s:titleContent>
 		<s:Label   fontSize="15"  id="lmessage" color="#F00000" />
 	</s:titleContent>
 	<s:actionContent>
-		<s:Image smooth="true" source="@Embed('assets/loginIcon.png')" enabled="{!isCamera}" click="show_LoginWindow()" right="2"/>
+		<s:HGroup verticalAlign="middle">
+			<!--s:Image id="ishow" source="@Embed('assets/addr.png')"  click="show_Handle()"  smooth="true" /-->
+			<s:Image id="splitshow1" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Label text="设置" fontSize="20" color="#999999" click="show_connect(event)"  fontFamily="微软雅黑"   verticalAlign="middle"/>
+			<s:Image id="splitshow4" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Label text="登录" fontSize="20" color="#999999"  fontFamily="微软雅黑" click="show_login(event)"   verticalAlign="middle"/>
+			<s:Image id="splitshow2" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Image id="changesizeshow" source="@Embed('assets/max.png')"  buttonMode="true" click="resize_app()"    smooth="true" />
+			<s:Image id="splitshow3" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Image id="closeshow" source="@Embed('assets/close_btn.png')"  buttonMode="true" click="close_app()"    smooth="true" />
+			<s:Spacer width="5"/>
+		</s:HGroup>
 	 
 	</s:actionContent>
-	<s:Scroller      id="scrllr1"      width="{this.width}" height="{this.height}">
-		<s:VGroup  id="vg1" width="{this.width}" height="{this.height}" horizontalAlign="center" verticalAlign="middle">
-			 <s:HGroup gap="10" includeIn="manual,auto" horizontalAlign="center"  width="{this.width}" height="{this.height*0.1}">
+	<s:Image id="bg"   scaleMode="stretch" source="assets/controlView.png" width="100%" height="100%" smooth="true"/>
+	<s:Scroller horizontalCenter="0"      id="scrllr1"      width="{this.width*0.9}" height="{this.height}">
+		<s:VGroup  id="vg1" width="{this.width*0.9}" height="{this.height}" horizontalAlign="center" verticalAlign="middle">
+			 <s:HGroup gap="10" includeIn="manual,auto" horizontalAlign="center"  width="{this.width*0.9}" height="{this.height*0.1}">
 				 <!--s:Image horizontalAlign="center" click="ManualView()"   id="manualSet" alpha="1" scaleMode="letterbox"    source="assets/manual.png" width="50%"   smooth="true"/>
  				 <s:Image  horizontalAlign="center" click="AutoView()" id="autoSet" alpha="0.5" scaleMode="letterbox"  source="assets/auto.png" width="50%"   smooth="true"/-->
-				 <s:Button color="white" skinClass="skins.MyControlButtonSkin"  height="100%" label="手动控制" chromeColor="green" click="ManualView()"   id="manualSet" width="45%" fontSize="25"/>
-				 <s:Button color="white" skinClass="skins.MyControlButtonSkin" height="100%" label="自动控制" chromeColor="green" click="AutoView()" id="autoSet" width="45%" alpha="0.3" fontSize="25"/>
+				 <s:Button color="white" skinClass="skins.MyControlButtonSkin"  height="100%" label="手动控制" chromeColor="green" click="ManualView()"   id="manualSet" width="50%" fontSize="25"/>
+				 <s:Button color="white" skinClass="skins.MyControlButtonSkin" height="100%" label="自动控制" chromeColor="green" click="AutoView()" id="autoSet" width="50%" alpha="0.3" fontSize="25"/>
 			 </s:HGroup>
-			<s:VGroup includeIn="manual" height="{this.height*0.8}" width="{this.width}" horizontalAlign="center">
+			<s:VGroup includeIn="manual" height="{this.height*0.8}" width="{this.width*0.9}" horizontalAlign="center">
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
-					<s:Image id="roller" source="assets/roller.png" width="15%" height="100%" smooth="true"  />
+					<s:Image id="roller" source="assets/roller.png" width="95" height="105" smooth="true"  />
 					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
 						
 						<s:ToggleButton id="roller1" color="white" width="45%" selected="false" click="roller1.selected = true;roller2.selected=false;"
@@ -1182,21 +1554,21 @@
 						<s:ToggleButton  id="rollerOn" color="white" width="33%" selected="false" click="rollerOn.selected = true;rollerOff.selected=false;rollerRet.selected =false; "
 										 label="开" skinClass="skins.LeftButtonSkin" />
 						<s:ToggleButton  id="rollerRet" color="white" width="33%" selected="false" click="rollerRet.selected = true;rollerOff.selected=false;rollerOn.selected=false;"
-										 label="停" skinClass="skins.MiddleButtonSkin" />
+										 label="收" skinClass="skins.MiddleButtonSkin" />
 						<s:ToggleButton  id="rollerOff" color="white" width="33%" selected="false" click="rollerOff.selected = true;rollerOn.selected=false;rollerRet.selected =false;"
-										 label="关" skinClass="skins.RightButtonSkin" />
+										 label="停" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="rdur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					<s:Image id="rdur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
 					
 					<s:HGroup  height="100%" verticalAlign="middle" width="25%">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider1"  
-									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+									 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					
-					<s:Button click="roller_set()" skinClass="skins.CustomizeButtonSkin" color="white"    width="10%" label="设置" horizontalCenter="0" verticalCenter="0"   height="60%"   fontSize="25"/>
+					<s:Button   click="roller_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
-					<s:Image id="fan"  source="assets/fan.png" width="15%" height="100%"  smooth="true"/>
+					<s:Image id="fan"  source="assets/fan.png" width="95" height="105"  smooth="true"/>
 					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
 						
 						<s:ToggleButton id="fan1" color="white" width="45%" selected="false" click="fan1.selected = true;fan2.selected=false;"
@@ -1211,16 +1583,16 @@
 						<s:ToggleButton id="fanOff" color="white" width="45%" selected="false" click="fanOff.selected = true;fanOn.selected=false;"
 										label="关" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="fdur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					<s:Image id="fdur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider2"  
-									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+									 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
-					<s:Button click="fan_set()" skinClass="skins.CustomizeButtonSkin" color="white"    width="10%" label="设置" horizontalCenter="0" verticalCenter="0"   height="60%"   fontSize="25"/>
+					<s:Button click="fan_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  width="95" height="60"     label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
-					<s:Image id="humidifier" source="assets/humidifier.png" width="15%" height="100%" smooth="true"/>
+					<s:Image id="humidifier" source="assets/humidifier.png" width="95" height="105" smooth="true"/>
 					<s:Label text="" width="25%" height="100%"/>
 					<s:HGroup gap="0" verticalAlign="middle" horizontalAlign="center" height="100%" width="25%">
 						
@@ -1229,17 +1601,17 @@
 						<s:ToggleButton id="humidifierOff" color="white" width="45%" selected="false" click="humidifierOff.selected = true;humidifierOn.selected=false;"
 										label="关" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="hdur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					<s:Image id="hdur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider3"  
-									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+									 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
-					<s:Button click="humidifier_set()" skinClass="skins.CustomizeButtonSkin" color="white"    width="10%" label="设置" horizontalCenter="0" verticalCenter="0"   height="60%"   fontSize="25"/>
+					<s:Button click="humidifier_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
-					<s:Image id="irrigation" source="assets/water.png" width="15%" height="100%"  smooth="true"/>
+					<s:Image id="irrigation" source="assets/water.png" width="95" height="105"  smooth="true"/>
 					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
 						<s:ToggleButton id="water1" color="white" width="25%" selected="false" click="water1.selected = true;water2.selected=false;water3.selected=false;water4.selected=false;"
 										label="1" skinClass="skins.LeftButtonSkin" />
@@ -1256,29 +1628,29 @@
 						<s:ToggleButton id="waterOff" color="white" width="45%" selected="false" click="waterOff.selected = true;waterOn.selected=false;"
 										label="关" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="idur" source="assets/duration.png" width="15%" height="100%"  smooth="true"/>
+					<s:Image id="idur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider4"  
-									 minimum="0" maximum="30" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+									 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="10"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
-					<s:Button click="irrigation_set()" skinClass="skins.CustomizeButtonSkin" color="white"  horizontalCenter="0" verticalCenter="0"   width="10%" label="设置"   height="60%"   fontSize="25"/>
+					<s:Button click="irrigation_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  horizontalCenter="0" verticalCenter="0"  width="95" height="60"   label="确定"      fontSize="25"/>
 				</s:HGroup>
 			</s:VGroup>	 
-			<s:VGroup id="autovg" includeIn="auto" height="{this.height*0.8}" width="{this.width}" horizontalAlign="center">
+			<s:VGroup id="autovg" includeIn="auto" height="{this.height*0.8}" width="{this.width*0.9}" horizontalAlign="center">
 			    <s:Image  verticalAlign="middle" id="addIcon" source="assets/addIcon.png" click="rgLook=null;ConditionView()" width="80" height="48"   smooth="true"/>
 			 </s:VGroup>
 		</s:VGroup>
 </s:Scroller>
-<s:Scroller top="2"  includeIn="condition"    id="scrllr"      width="{this.width}" height="{this.height}">
-	<s:VGroup top="5"  gap="0"  id="vg" width="{this.width}" height="{this.height}" horizontalAlign="center" >
-		<s:HGroup top="2" width="100%" horizontalAlign="center">
+	<s:Scroller horizontalScrollPolicy="off" horizontalCenter="0"    creationComplete="scrllr_create()" top="5"  includeIn="condition"    id="scrllr"      width="{this.width*0.9}" height="{this.height}">
+		<s:VGroup gap="20" top="5"   id="vg" width="{this.width*0.9}" height="{this.height}" horizontalAlign="center" >
+		<s:HGroup top="2" width="{this.width*0.9}" horizontalAlign="center">
 			<s:Image verticalAlign="middle" horizontalAlign="center"  id="leftdot2" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
 			<s:Label verticalAlign="middle" horizontalCenter="0"  text="条件设置" color="green" fontWeight="bold" fontSize="25"/>
 			<s:Image verticalAlign="middle"  horizontalAlign="center" id="rightdot2" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
 		</s:HGroup>
-	 <s:VGroup horizontalAlign="center">
-		 <s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
+	 <s:VGroup horizontalCenter="0" top="6" horizontalAlign="center" >
+		 <s:HGroup width="{this.width*0.9}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
 			 <s:Image   id="tem" source="{icon_T}" width="80" height="48"  click="TypeChange(1,event)" alpha="0.4"  smooth="true"/>
 			 <s:Image  id="hum" source="{icon_H}" width="80"  height="48" click="TypeChange(2,event)" alpha="0.4"  smooth="true"/>
 			 <s:Image id="stemp" source="{icon_ST}" width="80" height="48"  click="TypeChange(3,event)" alpha="0.4" smooth="true"/>
@@ -1288,7 +1660,7 @@
 			 <s:Image id="co" source="{icon_CO}" width="80"   height="48" click="TypeChange(7,event)" alpha="0.4" smooth="true"/>
 			 <s:Image id="co2" source="{icon_CO2}" width="80"   height="48" click="TypeChange(8,event)" alpha="0.4" smooth="true"/>
 		 </s:HGroup>
-		 <s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
+		 <s:HGroup width="{this.width*0.9}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
 			 <s:Label    id="temLabel"    text="温度" textAlign="center" width="80"   backgroundAlpha="0" color="#1d953f"/>
 			 <s:Label  id="humLabel"  text="湿度" textAlign="center" width="80"    backgroundAlpha="0" color="#1d953f"/>
 			 <s:Label  id="stempLabel"  text="土壤温度"  textAlign="center"  width="80"  backgroundAlpha="0" color="#1d953f"/>
@@ -1307,33 +1679,33 @@
 		</s:HGroup>
 	</s:VGroup>
 </s:Scroller>
-<s:VGroup top="5" includeIn="device"  id="vg2" width="{this.width}" height="{this.height}" horizontalAlign="center" >
+<s:Scroller horizontalScrollPolicy="off" horizontalCenter="0"    creationComplete="scrllr2_create()" top="5"  includeIn="device"    id="scrllr2"      width="{this.width*0.9}" height="{this.height}">
+<s:VGroup gap="20" top="5"   id="vg2" width="{this.width*0.9}" height="{this.height}" horizontalAlign="center" >
 		<s:HGroup top="2" width="100%" horizontalAlign="center">
 			<s:Image verticalAlign="middle" horizontalAlign="center"  id="leftdot3" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
 			<s:Label verticalAlign="middle" horizontalCenter="0"  text="操作设置" color="green" fontWeight="bold" fontSize="25"/>
 			<s:Image verticalAlign="middle"  horizontalAlign="center" id="rightdot3" fillMode="repeat" source="assets/dot.png" width="40%"   smooth="true"/>
 		</s:HGroup>
-	<s:VGroup horizontalAlign="center">
-		<s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
-			<s:Image click="mdgImg_Handle(event)"   id="myRoller" source="assets/roller.png" width="80" height="48"  alpha="0.4"  smooth="true"/>
-			<s:Image click="mdgImg_Handle(event)" id="myFan" source="assets/fan.png" width="80"  height="48"  alpha="0.4"  smooth="true"/>
-			<s:Image click="mdgImg_Handle(event)" id="myHumi" source="assets/humidifier.png" width="80" height="48"  alpha="0.4"  smooth="true"/>
-			<s:Image click="mdgImg_Handle(event)" id="myIrri"  source="assets/water.png" width="80"  height="48"  alpha="0.4"  smooth="true"/>
+	<s:VGroup top="10" horizontalAlign="center">
+		<s:HGroup top="10" width="{this.width*0.9}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
+			<s:Image top="10" click="mdgImg_Handle(event)"   id="innerRoller" source="assets/innerRoller.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+			<s:Image top="10" click="mdgImg_Handle(event)"   id="outerRoller" source="assets/outerRoller.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+			<s:Image top="10" click="mdgImg_Handle(event)" id="westFan" source="assets/westFan.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+			<s:Image top="10" click="mdgImg_Handle(event)" id="eastFan" source="assets/eastFan.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+            <s:Image top="10" click="mdgImg_Handle(event)" id="myHumi" source="assets/myHumi.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+			<s:Image top="10" click="mdgImg_Handle(event)" id="Irri1"  source="assets/Irri1.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+			<s:Image top="10" click="mdgImg_Handle(event)" id="Irri2"  source="assets/Irri2.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+			<s:Image top="10" click="mdgImg_Handle(event)" id="Irri3"  source="assets/Irri3.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
+			<s:Image top="10" click="mdgImg_Handle(event)" id="Irri4"  source="assets/Irri4.png" width="90" height="120"  alpha="0.4"  smooth="true"/>
 		</s:HGroup>
-		<s:HGroup width="{this.width}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
-			<s:Label    id="RollerLabel"    text="卷帘" textAlign="center" width="80"   backgroundAlpha="0" color="#1d953f"/>
-			<s:Label  id="FanLabel"  text="风扇" textAlign="center" width="80"    backgroundAlpha="0" color="#1d953f"/>
-			<s:Label  id="HumiLabel"  text="加湿器"  textAlign="center"  width="80"  backgroundAlpha="0" color="#1d953f"/>
-			<s:Label  id="IrriLabel"   text="灌溉"  textAlign="center" width="80"  backgroundAlpha="0" color="#1d953f"/>
-			
-		</s:HGroup>
+	 
 		</s:VGroup>
-		
-		
+		 
 		<s:HGroup    horizontalAlign="center">
 			<s:Image verticalAlign="middle" horizontalAlign="center"  id="before2" click="before2Click()"   source="assets/before.png" width="80" height="48"   smooth="true"/>
 			<s:Button id="mySetting" click="MySet()"  skinClass="skins.CustomizeButtonSkin" color="white" enabled="false"      label="{setType}"  width="100" height="48"  fontSize="25"/>
 		</s:HGroup>
 	</s:VGroup>
+	</s:Scroller>
 </s:View>
 
