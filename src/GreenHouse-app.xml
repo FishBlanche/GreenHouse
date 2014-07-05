@@ -121,7 +121,7 @@
         <resizable>true</resizable>
         <minSize>1024 768</minSize>
        <systemChrome>none</systemChrome>
-
+ 
  
         
         <softKeyboardBehavior>none</softKeyboardBehavior>

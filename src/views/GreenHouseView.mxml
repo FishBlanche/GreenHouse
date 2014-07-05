@@ -97,6 +97,8 @@
 					this.removeElement(connectGp);
 					connectGp=null;
 				}
+				datap.removeEventListener("_newSensingData",newData);
+				datap=null;
 			}
 			private function init():void
 			{
@@ -212,6 +214,7 @@
             }
 			private function data_Update(se:SensingEntry):void
 			{
+				trace("data_Update");
 				var targetArr:Array=new Array;
 				var mov:Move = new Move();
 				
@@ -459,7 +462,9 @@
 	<s:navigationContent>
 		<s:Spacer width="25"/>
 		<s:Image id="historyshow" source="assets/history_active.png"     smooth="true" />
+		<s:Spacer width="5"/>
 		<s:Image id="splitshow" source="@Embed('assets/split.png')"     smooth="true" />
+		<s:Spacer width="5"/>
 		<s:Image id="controlshow" click="control_view()"	source="assets/control_btn.png"     smooth="true" />  
 	 </s:navigationContent>
 	 

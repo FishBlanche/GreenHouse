@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark" removedFromStage="remove_Handle()"    xmlns:mx="library://ns.adobe.com/flex/mx"  xmlns:charts="charts.*"  backgroundAlpha="0.3" initialize="init()" creationComplete="create()">
+		xmlns:s="library://ns.adobe.com/flex/spark" removedFromStage="remove_Handle()" preinitialize="preinit()"    xmlns:mx="library://ns.adobe.com/flex/mx"  xmlns:charts="charts.*"  backgroundAlpha="0.3" initialize="init()" creationComplete="create()">
 	<fx:Declarations>
 		<mx:SeriesSlide  id="slide" direction="right"  duration="200"   />
 		<mx:SolidColorStroke id="chartStroke" color="black" weight="1" alpha="0.7"/>
@@ -111,21 +111,17 @@
 				phInfo.removeAll();phInfo=null;
 				co2Info.removeAll();co2Info=null;
 				lInfo.removeAll();lInfo=null;
-				this.parentApplication..addEventListener(MouseEvent.MOUSE_DOWN, function (e:MouseEvent):void {  
-					
-			//		NativeApplication.nativeApplication.activeWindow.startMove();
-					
-				})
+				
+			
+			}
+			private function preinit():void
+			{
+				  
+				 
 			}
 			private function init():void
 			{
-				
-				this.parentApplication..removeEventListener(MouseEvent.MOUSE_DOWN, function (e:MouseEvent):void {  
-					
-					NativeApplication.nativeApplication.activeWindow.startMove();
-					 
-				})
-				 slideTrans.direction="right";
+			    slideTrans.direction="right";
 				moteMap=data as Dictionary;
 				for(var e:Object in moteMap){ 
 					if(moteMap[e]==FlexGlobals.topLevelApplication.selectedArea)
@@ -334,24 +330,26 @@
 				
 			}
 			private function view_change():void{
-				trace("view_change()");
+				 
+			 	this.removeAllElements();
+				 
 				navigator.pushView(views.GreenHouseView,null,null,cross);
 			}
 		]]>
 	</fx:Script>
 	<s:navigationContent>
-		<s:Button icon="@Embed('assets/back.png')" click="view_change()"  height="55"/>
+		<s:Button icon="@Embed('assets/back.png')" click="view_change()"  />
 		<!--s:Spacer width="8"/-->
 		
 	</s:navigationContent>
 	 <s:titleContent>
-		 <s:Label fontSize="20" text="区域{FlexGlobals.topLevelApplication.selectedArea}历史趋势" color="halogreen"   verticalAlign="middle" backgroundAlpha="0" height="55" horizontalCenter="0"  />
+		 <s:Label fontFamily="微软雅黑" fontSize="16" text="区域{FlexGlobals.topLevelApplication.selectedArea}历史趋势" color="#999999"   verticalAlign="middle" backgroundAlpha="0"  horizontalCenter="0"  />
 		 <s:Spacer width="12"/>
 		 <s:HGroup verticalAlign="middle">
-			 <s:TextInput fontSize="20" styleName="itextInput"  color="#130c0e"          id="myday"  prompt="输入查看天数"  skinClass="spark.skins.mobile.TextInputSkin" />
- 			 <s:Label text="天" color="halogreen"   verticalAlign="middle" backgroundAlpha="0"   fontSize="20"  />
+			 <s:TextInput height="25" fontFamily="微软雅黑" fontSize="16" styleName="itextInput"  color="#999999"          id="myday"  prompt="输入查看天数"  skinClass="spark.skins.mobile.TextInputSkin" />
+ 			 <s:Label fontFamily="微软雅黑" text="天" color="#999999"   verticalAlign="middle" backgroundAlpha="0"   fontSize="16"  />
 			 <s:Image id="historyShowBtn"  click="search_click()"   source="assets/searchHis.png" />
-			 <s:BusyIndicator id="busy" width="48" height="48" visible="false" includeInLayout="false"    symbolColor="haloblue" />
+			 <s:BusyIndicator id="busy" width="20" height="20" visible="false" includeInLayout="false"    symbolColor="haloblue" />
 		 </s:HGroup>
 	 </s:titleContent>
 	<s:actionContent>
@@ -363,6 +361,6 @@
 			
 		</s:VGroup>
  
-</s:Scroller >
+</s:Scroller>
 	
 </s:View>

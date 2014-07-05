@@ -32,11 +32,12 @@
 			}
 			function onAddToStage(event:Event):void{
 				this.addEventListener(KeyboardEvent.KEY_DOWN,KeyboardListener);
-				this.addEventListener(MouseEvent.MOUSE_DOWN, function (e:MouseEvent):void {  
+				this.actionBar.addEventListener(MouseEvent.MOUSE_DOWN, function (e:MouseEvent):void {  
 					
-			//  	NativeApplication.nativeApplication.activeWindow.startMove();
-				  
+					NativeApplication.nativeApplication.activeWindow.startMove();
+					
 				})
+				 
 			}
 			private function KeyboardListener(event:KeyboardEvent):void{
 				 

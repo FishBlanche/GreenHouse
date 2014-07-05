@@ -29,7 +29,7 @@
 		</s:HGroup>
 		<s:Image id="rtime" source="assets/duration.png" width="80" height="48"  smooth="true"/>
 		<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="30%"    id="rSlider"  
-						 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="true"/>
+				 	 showDataTip="true"	 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="true"/>
 		<s:Image   source="assets/delIcon.png"   id="myDel"  width="80" height="48"  smooth="true"/>
 	</s:HGroup>
 	
