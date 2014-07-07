@@ -1498,7 +1498,10 @@
 			{
 				scrllr2.addEventListener(MouseEvent.MOUSE_DOWN,down_handle);
 			}
-			 
+			private	function dataFormat(value:Number):String {
+				 
+				return   "持续" + value+"分钟";
+			}     
 		]]>
 	</fx:Script>
 	<s:states>
@@ -1566,7 +1569,7 @@
 					
 					<s:HGroup  height="100%" verticalAlign="middle" width="25%">
 						<mx:HSlider     trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider1"  
-									 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+						 dataTipFormatFunction="dataFormat"			 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					
 					<s:Button   click="roller_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
@@ -1591,7 +1594,7 @@
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider2"  
-									 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
+									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					<s:Button click="fan_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  width="95" height="60"     label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
@@ -1610,7 +1613,7 @@
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider3"  
-									 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
+									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					<s:Button click="humidifier_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
@@ -1636,7 +1639,7 @@
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider4"  
-									 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="10"   allowTrackClick="true" liveDragging="false"/>
+									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="10"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					<s:Button click="irrigation_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  horizontalCenter="0" verticalCenter="0"  width="95" height="60"   label="确定"      fontSize="25"/>
 				</s:HGroup>

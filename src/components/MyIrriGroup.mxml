@@ -10,6 +10,10 @@
 			import skins.LeftButtonSkin;
 			import skins.MiddleButtonSkin;
 			import skins.RightButtonSkin;
+			private	function dataFormat(value:Number):String {
+				
+				return   "持续" + value+"分钟";
+			}    
 			
 		]]>
 	</fx:Script>
@@ -30,7 +34,7 @@
 		
 		<s:Image id="itime" source="assets/duration.png" width="80" height="48"  smooth="true"/>
 		<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="30%"    id="iSlider"  
-						 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="10"   allowTrackClick="true" liveDragging="true"/>
+					 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="10"   allowTrackClick="true" liveDragging="true"/>
 		<s:Image   source="assets/delIcon.png"  id="myDel"  width="80" height="48"  smooth="true"/>
 	</s:HGroup>
 	
