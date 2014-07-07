@@ -60,7 +60,7 @@
         <s:State name="disabledAndSelected" stateGroups="selectedUpStates, disabledStates, selectedStates" />
     </s:states>
     
-	<s:BitmapImage id="on" width="100%">
+	<s:BitmapImage height="100%" id="on" width="100%">
 		<s:source>
 			<s:MultiDPIBitmapSource
 				source160dpi="@Embed(source='assets/toggleBtnRightOff.png', scaleGridTop='0', scaleGridBottom='29', scaleGridLeft='6', scaleGridRight='7')"

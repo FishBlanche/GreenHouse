@@ -337,7 +337,7 @@
 				(e.currentTarget as Image).alpha=1;
 				ve.mySlider.minimum=myMin;
 				ve.mySlider.maximum=myMax;
-				ve.width=this.width*0.9;
+				ve.width=this.width*0.8;
 				ve.height=this.height*0.15;
 				ve.myDel.addEventListener(MouseEvent.CLICK,conditionDel_Handle);
 				vg.addElementAt(ve,vg.numChildren-1);
@@ -1498,6 +1498,7 @@
 			{
 				scrllr2.addEventListener(MouseEvent.MOUSE_DOWN,down_handle);
 			}
+			 
 		]]>
 	</fx:Script>
 	<s:states>
@@ -1545,26 +1546,26 @@
 			<s:VGroup includeIn="manual" height="{this.height*0.8}" width="{this.width*0.9}" horizontalAlign="center">
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
 					<s:Image id="roller" source="assets/roller.png" width="95" height="105" smooth="true"  />
-					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="30%">
 						
-						<s:ToggleButton id="roller1" color="white" width="45%" selected="false" click="roller1.selected = true;roller2.selected=false;"
+						<s:ToggleButton height="28%" id="roller1" color="white" width="45%" selected="false" click="roller1.selected = true;roller2.selected=false;"
 										label="内" skinClass="skins.LeftButtonSkin" />
-						<s:ToggleButton id="roller2" color="white" width="45%" selected="false" click="roller2.selected = true;roller1.selected=false;"
+						<s:ToggleButton height="28%" id="roller2" color="white" width="45%" selected="false" click="roller2.selected = true;roller1.selected=false;"
 										label="外" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
 					<s:HGroup gap="0"  verticalAlign="middle" horizontalAlign="center" height="100%" width="25%">
 						
-						<s:ToggleButton  id="rollerOn" color="white" width="33%" selected="false" click="rollerOn.selected = true;rollerOff.selected=false;rollerRet.selected =false; "
+						<s:ToggleButton height="28%"  id="rollerOn" color="white" width="33%" selected="false" click="rollerOn.selected = true;rollerOff.selected=false;rollerRet.selected =false; "
 										 label="开" skinClass="skins.LeftButtonSkin" />
-						<s:ToggleButton  id="rollerRet" color="white" width="33%" selected="false" click="rollerRet.selected = true;rollerOff.selected=false;rollerOn.selected=false;"
+						<s:ToggleButton height="28%"  id="rollerRet" color="white" width="33%" selected="false" click="rollerRet.selected = true;rollerOff.selected=false;rollerOn.selected=false;"
 										 label="收" skinClass="skins.MiddleButtonSkin" />
-						<s:ToggleButton  id="rollerOff" color="white" width="33%" selected="false" click="rollerOff.selected = true;rollerOn.selected=false;rollerRet.selected =false;"
+						<s:ToggleButton  height="28%" id="rollerOff" color="white" width="33%" selected="false" click="rollerOff.selected = true;rollerOn.selected=false;rollerRet.selected =false;"
 										 label="停" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="rdur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
+					<s:Image id="rdur" source="assets/duration.png" width="90" height="90"  smooth="true"/>
 					
 					<s:HGroup  height="100%" verticalAlign="middle" width="25%">
-						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider1"  
+						<mx:HSlider     trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider1"  
 									 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					
@@ -1572,21 +1573,21 @@
 				</s:HGroup>
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
 					<s:Image id="fan"  source="assets/fan.png" width="95" height="105"  smooth="true"/>
-					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="30%">
 						
-						<s:ToggleButton id="fan1" color="white" width="45%" selected="false" click="fan1.selected = true;fan2.selected=false;"
+						<s:ToggleButton height="28%" id="fan1" color="white" width="45%" selected="false" click="fan1.selected = true;fan2.selected=false;"
 										label="西" skinClass="skins.LeftButtonSkin" />
-						<s:ToggleButton id="fan2" color="white" width="45%" selected="false" click="fan2.selected = true;fan1.selected=false;"
+						<s:ToggleButton height="28%" id="fan2" color="white" width="45%" selected="false" click="fan2.selected = true;fan1.selected=false;"
 										label="东" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
 					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
 						
-						<s:ToggleButton id="fanOn" color="white" width="45%" selected="false" click="fanOn.selected = true;fanOff.selected=false;"
+						<s:ToggleButton height="28%" id="fanOn" color="white" width="45%" selected="false" click="fanOn.selected = true;fanOff.selected=false;"
 										label="开" skinClass="skins.LeftButtonSkin" />
-						<s:ToggleButton id="fanOff" color="white" width="45%" selected="false" click="fanOff.selected = true;fanOn.selected=false;"
+						<s:ToggleButton height="28%" id="fanOff" color="white" width="45%" selected="false" click="fanOff.selected = true;fanOn.selected=false;"
 										label="关" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="fdur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
+					<s:Image id="fdur" source="assets/duration.png" width="90" height="90"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider2"  
@@ -1596,15 +1597,15 @@
 				</s:HGroup>
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
 					<s:Image id="humidifier" source="assets/humidifier.png" width="95" height="105" smooth="true"/>
-					<s:Label text="" width="25%" height="100%"/>
+					<s:Label text="" width="30%" height="100%"/>
 					<s:HGroup gap="0" verticalAlign="middle" horizontalAlign="center" height="100%" width="25%">
 						
-						<s:ToggleButton id="humidifierOn" color="white" width="45%" selected="false" click="humidifierOn.selected = true;humidifierOff.selected=false;"
+						<s:ToggleButton height="28%" id="humidifierOn" color="white" width="45%" selected="false" click="humidifierOn.selected = true;humidifierOff.selected=false;"
 										label="开" skinClass="skins.LeftButtonSkin" />
-						<s:ToggleButton id="humidifierOff" color="white" width="45%" selected="false" click="humidifierOff.selected = true;humidifierOn.selected=false;"
+						<s:ToggleButton height="28%" id="humidifierOff" color="white" width="45%" selected="false" click="humidifierOff.selected = true;humidifierOn.selected=false;"
 										label="关" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="hdur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
+					<s:Image id="hdur" source="assets/duration.png" width="90" height="90"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						
@@ -1615,23 +1616,23 @@
 				</s:HGroup>
 				<s:HGroup horizontalAlign="center" verticalAlign="middle" height="25%" width="100%">
 					<s:Image id="irrigation" source="assets/water.png" width="95" height="105"  smooth="true"/>
-					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
-						<s:ToggleButton id="water1" color="white" width="25%" selected="false" click="water1.selected = true;water2.selected=false;water3.selected=false;water4.selected=false;"
-										label="1" skinClass="skins.LeftButtonSkin" />
-						<s:ToggleButton id="water2" color="white" width="25%" selected="false" click="water2.selected = true;water1.selected=false;water3.selected=false;water4.selected=false;"
-										label="2" skinClass="skins.MiddleButtonSkin" />
-						<s:ToggleButton id="water3" color="white" width="25%" selected="false" click="water3.selected = true;water1.selected=false;water2.selected=false;water4.selected=false;"
-										label="3" skinClass="skins.MiddleButtonSkin" />
-						<s:ToggleButton id="water4" color="white" width="25%" selected="false" click="water4.selected = true;water1.selected=false;water2.selected=false;water3.selected=false;"
-										label="4" skinClass="skins.RightButtonSkin" />
+					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="30%">
+						<s:ToggleButton height="28%" id="water1" color="white" width="25%" selected="false" click="water1.selected = true;water2.selected=false;water3.selected=false;water4.selected=false;"
+										label="区域1" skinClass="skins.LeftButtonSkin" />
+						<s:ToggleButton height="28%" id="water2" color="white" width="25%" selected="false" click="water2.selected = true;water1.selected=false;water3.selected=false;water4.selected=false;"
+										label="区域2" skinClass="skins.MiddleButtonSkin" />
+						<s:ToggleButton height="28%" id="water3" color="white" width="25%" selected="false" click="water3.selected = true;water1.selected=false;water2.selected=false;water4.selected=false;"
+										label="区域3" skinClass="skins.MiddleButtonSkin" />
+						<s:ToggleButton height="28%" id="water4" color="white" width="25%" selected="false" click="water4.selected = true;water1.selected=false;water2.selected=false;water3.selected=false;"
+										label="区域4" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
 					<s:HGroup verticalAlign="middle" gap="0" horizontalAlign="center" height="100%" width="25%">
-						<s:ToggleButton id="waterOn" color="white" width="45%" selected="false" click="waterOn.selected = true;waterOff.selected=false;"
+						<s:ToggleButton height="28%" id="waterOn" color="white" width="45%" selected="false" click="waterOn.selected = true;waterOff.selected=false;"
 										label="开" skinClass="skins.LeftButtonSkin" />
-						<s:ToggleButton id="waterOff" color="white" width="45%" selected="false" click="waterOff.selected = true;waterOn.selected=false;"
+						<s:ToggleButton height="28%" id="waterOff" color="white" width="45%" selected="false" click="waterOff.selected = true;waterOn.selected=false;"
 										label="关" skinClass="skins.RightButtonSkin" />
 					</s:HGroup>
-					<s:Image id="idur" source="assets/duration.png" width="95" height="95"  smooth="true"/>
+					<s:Image id="idur" source="assets/duration.png" width="90" height="90"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider4"  
@@ -1654,25 +1655,16 @@
 		</s:HGroup>
 	 <s:VGroup horizontalCenter="0" top="6" horizontalAlign="center" >
 		 <s:HGroup width="{this.width*0.9}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
-			 <s:Image   id="tem" source="{icon_T}" width="80" height="48"  click="TypeChange(1,event)" alpha="0.4"  smooth="true"/>
-			 <s:Image  id="hum" source="{icon_H}" width="80"  height="48" click="TypeChange(2,event)" alpha="0.4"  smooth="true"/>
-			 <s:Image id="stemp" source="{icon_ST}" width="80" height="48"  click="TypeChange(3,event)" alpha="0.4" smooth="true"/>
-			 <s:Image id="shum"  source="{icon_SH}" width="80"  height="48" click="TypeChange(4,event)" alpha="0.4"  smooth="true"/>
-			 <s:Image id="l" source="{icon_L}" width="80"   height="48" click="TypeChange(5,event)" alpha="0.4"  smooth="true"/>
-			 <s:Image id="ph" source="{icon_PH}" width="80"  height="48" click="TypeChange(6,event)" alpha="0.4"  smooth="true"/>
-			 <s:Image id="co" source="{icon_CO}" width="80"   height="48" click="TypeChange(7,event)" alpha="0.4" smooth="true"/>
-			 <s:Image id="co2" source="{icon_CO2}" width="80"   height="48" click="TypeChange(8,event)" alpha="0.4" smooth="true"/>
+			 <s:Image   id="tem" source="{icon_T}" width="90" height="120"  click="TypeChange(1,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image  id="hum" source="{icon_H}" width="90" height="120" click="TypeChange(2,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="stemp" source="{icon_ST}" width="90" height="120"  click="TypeChange(3,event)" alpha="0.4" smooth="true"/>
+			 <s:Image id="shum"  source="{icon_SH}" width="90" height="120" click="TypeChange(4,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="l" source="{icon_L}" width="90" height="120" click="TypeChange(5,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="ph" source="{icon_PH}" width="90" height="120" click="TypeChange(6,event)" alpha="0.4"  smooth="true"/>
+			 <s:Image id="co" source="{icon_CO}" width="90" height="120" click="TypeChange(7,event)" alpha="0.4" smooth="true"/>
+			 <s:Image id="co2" source="{icon_CO2}" width="90" height="120" click="TypeChange(8,event)" alpha="0.4" smooth="true"/>
 		 </s:HGroup>
-		 <s:HGroup width="{this.width*0.9}" height="{this.height*0.1}" horizontalAlign="center" verticalAlign="middle">
-			 <s:Label    id="temLabel"    text="温度" textAlign="center" width="80"   backgroundAlpha="0" color="#1d953f"/>
-			 <s:Label  id="humLabel"  text="湿度" textAlign="center" width="80"    backgroundAlpha="0" color="#1d953f"/>
-			 <s:Label  id="stempLabel"  text="土壤温度"  textAlign="center"  width="80"  backgroundAlpha="0" color="#1d953f"/>
-			 <s:Label  id="shumLabel"   text="土壤湿度"  textAlign="center" width="80"  backgroundAlpha="0" color="#1d953f"/>
-			 <s:Label  id="lLabel"  text="光照"  textAlign="center"  width="80"  backgroundAlpha="0" color="#1d953f"/>
-			 <s:Label  id="phLabel"   text="ph"  textAlign="center"  width="80" backgroundAlpha="0" color="#1d953f"/>
-			 <s:Label  id="coLabel"  text="co"   textAlign="center" width="80"  backgroundAlpha="0" color="#1d953f"/>
-			 <s:Label  id="co2Label" text="co2"  textAlign="center" width="80"    backgroundAlpha="0" color="#1d953f"/>
-		 </s:HGroup>
+		 
 	 </s:VGroup>
 		
 	  

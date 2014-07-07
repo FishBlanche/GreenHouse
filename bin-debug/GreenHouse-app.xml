@@ -18,7 +18,7 @@
 	<id>com.run.GreenHouse.debug</id>
 
 	<!-- Used as the filename for the application. Required. -->
-	<filename>GreenHouse</filename>
+	<filename>智慧大棚</filename>
 
 	<!-- The name that is displayed in the AIR application installer. 
 	May have multiple values for each language. See samples or xsd schema file. Optional. -->
