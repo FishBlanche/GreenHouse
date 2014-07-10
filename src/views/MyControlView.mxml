@@ -9,11 +9,12 @@
 			showPromptWhenFocused: false;
 			borderVisible:false;
 		}
-		.iHSlider
-		{
-			color:white;
-			fontSize: 15;
-		}
+		 
+			.sliderLabel
+			{
+				color: #1d953f;
+				fontSize: 13;
+			}
 	</fx:Style>
 	<fx:Declarations>
 	 
@@ -24,6 +25,7 @@
 			import mx.collections.ArrayCollection;
 			import mx.core.FlexGlobals;
 			import mx.core.IVisualElement;
+			import mx.effects.easing.Bounce;
 			import mx.events.FlexEvent;
 			import mx.formatters.DateFormatter;
 			import mx.messaging.ChannelSet;
@@ -33,7 +35,7 @@
 			import mx.rpc.remoting.RemoteObject;
 			import mx.utils.StringUtil;
 			import mx.utils.UIDUtil;
-			import mx.effects.easing.Bounce;
+			
 			import spark.components.Group;
 			import spark.managers.PersistenceManager;
 			import spark.skins.mobile.TextInputSkin;
@@ -287,41 +289,62 @@
 					case 1:myMin=-30;
 						myMax=100;//温度
 						ve.myPic.source=icon_T;
+						ve.mySlider.tickInterval=10;
+						
+						ve.mySlider.labels=new Array(-30,-20,-10,0,10,20,30,40,50,60,70,80,90,100);
 						ve.myPic.name="1";
 						break;
 					case 2:myMin=0;
 						myMax=100;//湿度
 						ve.myPic.source=icon_H;
+						ve.mySlider.tickInterval=10;
+						ve.mySlider.labels=new Array(0,10,20,30,40,50,60,70,80,90,100);
 						ve.myPic.name="2";
 						break;
 					case 3:myMin=-30;
 						myMax=70;//土壤温度
 						ve.myPic.source=icon_ST;
+						ve.mySlider.tickInterval=10;
+						ve.mySlider.labels=new Array(-30,-20,-10,0,10,20,30,40,50,60,70);
 						ve.myPic.name="3";
 						break;
 					case 4:myMin=0;
 						myMax=100;//土壤湿度
 						ve.myPic.source=icon_SH;
+						ve.mySlider.tickInterval=10;
+						ve.mySlider.labels=new Array(0,10,20,30,40,50,60,70,80,90,100);
 						ve.myPic.name="4";
 						break;
 					case 5:myMin=0;
 						myMax=10000;//光照
 						ve.myPic.source=icon_L;
+						ve.mySlider.snapInterval=20;
+						ve.mySlider.tickInterval=2000;
+						ve.mySlider.labels=new Array(0,2000,4000,6000,8000,10000);
 						ve.myPic.name="5";
 						break;
 					case 6:myMin=0;
-						myMax=7;//土壤PH
+						myMax=14;//土壤PH
 						ve.myPic.source=icon_PH;
+						ve.mySlider.tickInterval=2;
+						ve.mySlider.snapInterval=0.2;
+						ve.mySlider.labels=new Array(0,2,4,6,8,10,12,14);
 						ve.myPic.name="6";
 						break;
 					case 7:myMin=0;
 						myMax=200;//CO
 						ve.myPic.source=icon_CO;
+						ve.mySlider.tickInterval=20;
+						
+						ve.mySlider.labels=new Array(0,20,40,60,80,100,120,140,160,180,200);
 						ve.myPic.name="7";
 						break;
 					case 8:myMin=0;
 						myMax=5000;//CO2
 						ve.myPic.source=icon_CO2;
+						ve.mySlider.tickInterval=1000;
+						ve.mySlider.snapInterval=20;
+						ve.mySlider.labels=new Array(0,1000,2000,3000,4000,5000);
 						ve.myPic.name="8";
 						break;
 					default:break;
@@ -367,6 +390,7 @@
 						rgInner.width=this.width*0.9;
 						rgInner.height=this.height*0.15;
 						rgInner.roller.source="assets/innerRoller.png";
+						 
 						rgInner.myDel.name="rgInnerDel";
 						rgInner.myDel.addEventListener(MouseEvent.CLICK,controlDel_Handle);
 					    vg2.addElementAt(rgInner,vg2.numChildren-1);
@@ -397,7 +421,6 @@
 						break;
 					case "eastFan": if(!fgEast)
 					{
-						
 						fgEast=new MyFanGroup;
 						fgEast.width=this.width*0.9;
 						fgEast.height=this.height*0.15;
@@ -708,41 +731,60 @@
 									case "1":myMin=-30;
 										myMax=100;//温度
 										cg.myPic.source=icon_T;
+										cg.mySlider.tickInterval=10;
+										cg.mySlider.labels=new Array(-30,-20,-10,0,10,20,30,40,50,60,70,80,90,100);
 										cg.myPic.name="1";
 										break;
 									case "2":myMin=0;
 										myMax=100;//湿度
 										cg.myPic.source=icon_H;
+										cg.mySlider.tickInterval=10;
+										cg.mySlider.labels=new Array(0,10,20,30,40,50,60,70,80,90,100);
 										cg.myPic.name="2";
 										break;
 									case "3":myMin=-30;
 										myMax=70;//土壤温度
 										cg.myPic.source=icon_ST;
+										cg.mySlider.tickInterval=10;
+										cg.mySlider.labels=new Array(-30,-20,-10,0,10,20,30,40,50,60,70);
 										cg.myPic.name="3";
 										break;
 									case "4":myMin=0;
 										myMax=100;//土壤湿度
 										cg.myPic.source=icon_SH;
+										cg.mySlider.tickInterval=10;
+										cg.mySlider.labels=new Array(0,10,20,30,40,50,60,70,80,90,100);
 										cg.myPic.name="4";
 										break;
 									case "5":myMin=0;
 										myMax=10000;//光照
 										cg.myPic.source=icon_L;
+										cg.mySlider.tickInterval=2000;
+										cg.mySlider.snapInterval=20;
+										cg.mySlider.labels=new Array(0,2000,4000,6000,8000,10000);
 										cg.myPic.name="5";
 										break;
 									case "6":myMin=0;
-										myMax=7;//土壤PH
+										myMax=14;//土壤PH
 										cg.myPic.source=icon_PH;
+										cg.mySlider.tickInterval=2;
+										cg.mySlider.snapInterval=0.2;
+										cg.mySlider.labels=new Array(0,2,4,6,8,10,12,14);
 										cg.myPic.name="6";
 										break;
 									case "7":myMin=0;
 										myMax=200;//CO
 										cg.myPic.source=icon_CO;
+										cg.mySlider.tickInterval=20;
+										cg.mySlider.labels=new Array(0,20,40,60,80,100,120,140,160,180,200);
 										cg.myPic.name="7";
 										break;
 									case "8":myMin=0;
 										myMax=5000;//CO2
 										cg.myPic.source=icon_CO2;
+										cg.mySlider.tickInterval=1000;
+										cg.mySlider.snapInterval=20;
+										cg.mySlider.labels=new Array(0,1000,2000,3000,4000,5000);
 										cg.myPic.name="8";
 										break;
 									default:break;
@@ -773,7 +815,7 @@
 										default:break;
 									}
 								}
-							    cg.width=this.width*0.9;
+							    cg.width=this.width*0.8;
 								cg.height=this.height*0.15;
 								cg.myDel.addEventListener(MouseEvent.CLICK,conditionDel_Handle);
 								vg.addElementAt(cg,vg.numChildren-1);
@@ -1569,7 +1611,7 @@
 					
 					<s:HGroup  height="100%" verticalAlign="middle" width="25%">
 						<mx:HSlider     trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider1"  
-						 dataTipFormatFunction="dataFormat"			 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+						 dataTipFormatFunction="dataFormat"			 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="5"  labelStyleName="sliderLabel"  labels="[0,5,10,15,20]"   snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					
 					<s:Button   click="roller_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
@@ -1594,7 +1636,7 @@
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider2"  
-									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
+									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="180"  labelStyleName="sliderLabel"  labels="[0,180,360,540,720]" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					<s:Button click="fan_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  width="95" height="60"     label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
@@ -1613,7 +1655,7 @@
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider3"  
-									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
+									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="180"  labelStyleName="sliderLabel"  labels="[0,180,360,540,720]" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					<s:Button click="humidifier_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
@@ -1639,7 +1681,7 @@
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider4"  
-									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="10"   allowTrackClick="true" liveDragging="false"/>
+									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="30"  labelStyleName="sliderLabel"  labels="[0,30,60,90,120]" snapInterval="10"   allowTrackClick="true" liveDragging="false"/>
 					</s:HGroup>
 					<s:Button click="irrigation_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  horizontalCenter="0" verticalCenter="0"  width="95" height="60"   label="确定"      fontSize="25"/>
 				</s:HGroup>

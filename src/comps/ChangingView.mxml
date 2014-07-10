@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:BorderContainer xmlns:s="library://ns.adobe.com/flex/spark" xmlns:fx="http://ns.adobe.com/mxml/2009"
+	width="100%" 
+	height="100%" 
+	creationComplete="init()" xmlns:mx="library://ns.adobe.com/flex/mx">
+	
+	<fx:Script>
+		<![CDATA[
+			import flash.utils.setTimeout;
+			
+			import mx.binding.utils.BindingUtils;
+			import mx.core.UIComponent;
+			import mx.effects.Move;
+			import mx.effects.Resize;
+			import mx.events.EffectEvent;
+			import mx.events.IndexChangedEvent;
+			import mx.events.ResizeEvent;
+			
+			import components.RealDataGroup;
+		
+			/**
+			 * 视图对象 
+			 */
+			[Bindable]
+			private var _views:Array;
+			
+			/**
+			 * 主视图索引 
+			 */
+			private var _mainIndex:Number = NaN;
+			
+			/**
+			 * 原始视图 
+			 */
+			private var _oldView:RealDataGroup;
+			
+			/**
+			 * 当前主窗口显示视图 
+			 */
+			private var _currentView:RealDataGroup;
+			
+			
+			/**
+			 * 效果执行时间 默认是400毫秒 
+			 */
+			public var duration:Number = 200;
+			
+			/**
+			 * 导航中每个视图最小百分比 
+			 */
+	  
+			/**
+			 * 间隔
+			 */
+			public var space:Number = 20;
+			
+			
+			/**
+			 * 主地图的百分比 ,根据布局计算
+			 */
+			private var _mainPercent:Number = 80;
+			
+			private var current_active_X:Number ;
+			private var current_active_Y:Number ;
+			/**
+			 * 页面初始化 
+			 */
+			private function init():void{
+				
+				this.viewContainer.addEventListener(ResizeEvent.RESIZE,containerResizeHandler);
+			}
+			
+			private function containerResizeHandler(event:ResizeEvent):void{
+				
+				if( this._views != null && this._views.length != 0 )
+				{
+					for (var i:int = 0 ; i < this._views.length ; i++) {
+						
+						var display:RealDataGroup= this._views[i] as RealDataGroup;
+						this.viewContainer.removeElement(display);
+						 
+						 
+						
+					}
+					setTimeout(displayChangingCompleteHandler,this.duration);
+					
+				}
+				
+			}
+			private function displayChangingCompleteHandler():void{
+				
+				this.addAllView(this._views);
+				
+			}
+			
+			/**
+			 * 添加视图窗口
+			 */
+			public function addViews(childs:Array):void{
+				
+				if (childs == null || childs.length == 0)
+					return;
+				
+				this._views = childs;
+				
+				this.removeAllView();
+				this.addAllView(this._views);
+				
+			 
+			}
+			
+			
+			/**
+			 * 删除所有视图 
+			 */
+			private function removeAllView():void{
+				
+			 
+			}
+			
+			/**
+			 * 将视图添加到容器中 
+			 */
+			private function addAllView(views:Array):void{
+				
+				for (var i:int = 0 ; i < views.length ; i++) {
+					
+					var display:RealDataGroup= views[i] as RealDataGroup;
+				 
+					this.viewContainer.addElement(display);
+					display.zoomIn.includeInLayout=false;
+					display.zoomIn.visible=false;
+					display.zoomOut.includeInLayout=true;
+					display.zoomOut.visible=true;
+					display.includeInLayout=true;
+					display.visible=true;
+					this.effectExtent(display,this.getNavExtent(i));
+					display.zoomOutCall=this.viewZoomOut;
+					display.zoomInCall=this.viewZoomIn;
+					
+				}
+				
+			}
+			private function viewZoomOut(display:RealDataGroup):void{
+				var _newIndex:int = viewContainer.getElementIndex(display); 
+				
+				current_active_X=display.x;
+				current_active_Y=display.y;
+			
+				display.zoomIn.includeInLayout=true;
+				display.zoomIn.visible=true;
+				display.zoomOut.visible=false;
+				display.zoomOut.includeInLayout=false;
+				this.effectExtent(display,getMainExtent());
+				var navs:Array = new Array();
+				
+				for (var n:int = _newIndex + 1 ; n < this._views.length ; n++) {
+					navs.push(this._views[n]);
+				}
+				
+				for (var f:int = 0 ; f < _newIndex && f < this._views.length ; f ++) {
+					navs.push(this._views[f]);
+				}
+				var display:RealDataGroup;
+				
+				for (var i:int = 0; i < navs.length ; i ++ ) {
+					
+					display = navs[i] as RealDataGroup;
+					display.includeInLayout=false;
+					display.visible=false;
+				}
+			}
+			private function viewZoomIn(display:RealDataGroup):void{
+				var _newIndex:int = viewContainer.getElementIndex(display); 
+				display.zoomIn.includeInLayout=false;
+				display.zoomIn.visible=false;
+				display.zoomOut.visible=true;
+				display.zoomOut.includeInLayout=true;
+				this.effectExtent(display,getCurrentViewExtent());
+				var navs:Array = new Array();
+				
+				for (var n:int = _newIndex + 1 ; n < this._views.length ; n++) {
+					navs.push(this._views[n]);
+				}
+				
+				for (var f:int = 0 ; f < _newIndex && f < this._views.length ; f ++) {
+					navs.push(this._views[f]);
+				}
+				var display:RealDataGroup;
+				
+				for (var i:int = 0; i < navs.length ; i ++ ) {
+					
+					display = navs[i] as RealDataGroup;
+					display.includeInLayout=true;
+					display.visible=true;
+				}
+			}
+		  
+			private function getCurrentViewExtent():Object {
+				var width:Number = (this.viewContainer.width-27)/2;
+				
+				var height:Number=(this.viewContainer.height-27)/2;
+				
+				
+				var x:Number =current_active_X;
+				var y:Number=current_active_Y;
+				
+				var extent:Object = {
+					
+					x : x,
+					y : y,
+					width : width,
+					height : height
+					
+				}
+				
+				return extent;
+			}
+			private function getMainExtent():Object {
+				var width:Number = this.viewContainer.width;
+				
+				var height:Number=this.viewContainer.height;
+				
+				
+				var x:Number =this.viewContainer.x;
+		    	var y:Number=this.viewContainer.y;
+			 
+				var extent:Object = {
+					
+					x : x,
+					y : y,
+					width : width,
+					height : height
+					
+				}
+				
+				return extent;
+			}
+			
+			/**
+			 * 获取导航视图extent 
+			 */
+			private function getNavExtent(index:int):Object {
+				
+				var width:Number = (this.viewContainer.width-27)/2;
+				
+				var height:Number=(this.viewContainer.height-27)/2;
+				 
+				
+				var x:Number =this.viewContainer.x+ width*(index%2)+27*(index%2);
+				var y:Number;
+				if(index<2)
+				{
+					y=this.viewContainer.y;
+				}
+				else
+				{
+					y=this.viewContainer.y+height+27;
+				}
+				var extent:Object = {
+					
+					x : x,
+					y : y,
+					width : width,
+					height : height
+				
+				}
+				
+				return extent;
+			}
+			
+			
+			/**
+			 * 执行效果 
+			 */
+			private function effectExtent(display:DisplayObject,extent:Object):void{
+				
+				this.effect(display,extent.x,extent.y,extent.width,extent.height);
+				
+			}
+			
+			/**
+			 * 执行效果 
+			 */
+			private function effect(display:DisplayObject,toX:int,toY:int,toWidth:Number,toHeight:Number):void{
+			
+				var moves:Move = new Move();
+				moves.target = display;
+				moves.xFrom = display.x;
+				moves.yFrom = display.y;
+				moves.xTo = toX;
+				moves.yTo = toY;
+				moves.duration = this.duration;
+				moves.play();
+			
+				var resize:Resize = new Resize();
+				resize.target = display;
+				resize.widthTo = toWidth;
+				resize.heightTo = toHeight;
+				resize.duration = this.duration;
+				resize.play();				
+				
+			}
+		 
+		]]>
+	</fx:Script>
+	 
+	<s:BorderContainer horizontalCenter="0"  verticalCenter="0"   backgroundAlpha="0" borderAlpha="0" id="viewContainer" width="100%" height="100%"   >
+		 
+	</s:BorderContainer>
+	 
+</s:BorderContainer>

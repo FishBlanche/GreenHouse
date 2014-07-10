@@ -22,7 +22,7 @@
 			<s:CheckBox    id="smallCheck" color="green" label="小于" click="smallCheck.selected=true;bigCheck.selected=false;" fontSize="15" height="100%" width="20%" selected="false"  >
 			</s:CheckBox>
 			<mx:HSlider id="mySlider" trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"     horizontalCenter="0"  verticalCenter="0"     height="100%"      width="40%"      
-						    dataTipOffset="6"   dataTipPlacement="top"   tickColor="white" labelStyleName="iHSlider" snapInterval="0.5"   allowTrackClick="true" liveDragging="true"/>
+						    dataTipOffset="6"   dataTipPlacement="top"   tickColor="#1d953f" labelStyleName="sliderLabel" snapInterval="0.5"   allowTrackClick="true" liveDragging="true"/>
 			<s:Image   source="assets/delIcon.png"  id="myDel"  width="80" height="48"  smooth="true"/>
 		</s:HGroup>
 		<s:HGroup horizontalAlign="center" width="60%" height="50%">

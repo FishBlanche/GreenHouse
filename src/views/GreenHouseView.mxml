@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
-		xmlns:s="library://ns.adobe.com/flex/spark"       backgroundAlpha="0.3"    xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" removedFromStage="remove_Handle()"  creationComplete="create()" xmlns:components="components.*" xmlns:views="views.*">
+		xmlns:s="library://ns.adobe.com/flex/spark"   xmlns:comps="comps.*"    backgroundAlpha="0.3"    xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" removedFromStage="remove_Handle()"  creationComplete="create()" xmlns:components="components.*" xmlns:views="views.*">
 	<fx:Declarations>
 	</fx:Declarations>
 		<fx:Style>
@@ -199,6 +199,7 @@
 			}
 			private function create():void
 			{
+				changestateview.addViews([this.rdg1,this.rdg2,this.rdg4,this.rdg3]);
 				rdg1.area.text="区域一";
 			 
 				rdg1.searchHis.addEventListener(MouseEvent.CLICK,rc1Click);
@@ -214,7 +215,7 @@
             }
 			private function data_Update(se:SensingEntry):void
 			{
-				trace("data_Update");
+				//trace("data_Update");
 				var targetArr:Array=new Array;
 				var mov:Move = new Move();
 				
@@ -485,20 +486,22 @@
 	 
 	 <s:Image id="bg"   scaleMode="stretch" source="assets/mainview.png" width="100%" height="100%" smooth="true"/>
 	 <!--s:VGroup   height="{Capabilities.screenResolutionY}" width="{Capabilities.screenResolutionX}"-->
-	 <s:VGroup   gap="27"  horizontalAlign="center"  verticalAlign="middle"  height="{this.height}" width="{this.width}">
+	
+	<comps:ChangingView backgroundAlpha="0" borderAlpha="0" horizontalCenter="0" verticalCenter="0" id="changestateview" width="70%"  height="80%" />   
+	<components:RealDataGroup  backgroundImage="@Embed('assets/area1.png')" id="rdg1" width="35%" height="100%"/>
+	<components:RealDataGroup backgroundImage="@Embed('assets/area2.png')" id="rdg2" width="35%" height="100%"/>
+	<components:RealDataGroup backgroundImage="@Embed('assets/area4.png')" id="rdg4" width="35%" height="100%"/>
+	<components:RealDataGroup backgroundImage="@Embed('assets/area3.png')" id="rdg3" width="35%" height="100%"/>
+	 <!--s:VGroup   gap="27"  horizontalAlign="center"  verticalAlign="middle"  height="{this.height}" width="{this.width}">
 		 <s:HGroup gap="27" width="80%" height="40%" horizontalAlign="center" verticalAlign="middle">
 			 <components:RealDataGroup  backgroundImage="@Embed('assets/area1.png')" id="rdg1" width="35%" height="100%"/>
 			 <components:RealDataGroup backgroundImage="@Embed('assets/area2.png')" id="rdg2" width="35%" height="100%"/>
-			 <!--s:Image smooth="true" source="assets/area1.png"   height="100%"/>
-			 <s:Image smooth="true" source="assets/area2.png"   height="100%"/-->
 		 </s:HGroup>
 		 <s:HGroup gap="27" width="80%" height="40%" horizontalAlign="center" verticalAlign="middle">
 			 <components:RealDataGroup backgroundImage="@Embed('assets/area4.png')" id="rdg4" width="35%" height="100%"/>
 			 <components:RealDataGroup backgroundImage="@Embed('assets/area3.png')" id="rdg3" width="35%" height="100%"/>
-			 <!--s:Image smooth="true" source="assets/area4.png"   height="100%"/>
-			 <s:Image smooth="true" source="assets/area3.png"   height="100%"/-->
 		 </s:HGroup>
-	</s:VGroup>
+	</s:VGroup-->
 	 
 	<s:BusyIndicator horizontalCenter="0" verticalCenter="0" id="busy" visible="{FlexGlobals.topLevelApplication.GlobalBusy}" width="60" height="60" right="0"  symbolColor="haloblue" >
 	</s:BusyIndicator> 
