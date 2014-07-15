@@ -7,6 +7,8 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import spark.skins.mobile.TextInputSkin;
+			
 			import skins.LeftButtonSkin;
 			import skins.MiddleButtonSkin;
 			import skins.RightButtonSkin;
@@ -33,8 +35,8 @@
 		</s:HGroup>
 		
 		<s:Image id="itime" source="assets/duration.png" width="80" height="48"  smooth="true"/>
-		<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="30%"    id="iSlider"  
-					 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="30"  labelStyleName="sliderLabel"  labels="[0,30,60,90,120]" snapInterval="10"   allowTrackClick="true" liveDragging="true"/>
+ 		<s:TextInput restrict="0-9"   width="10%"  skinClass="spark.skins.mobile.TextInputSkin" color="#999999" verticalCenter="0"   id="iSlidertime"   fontFamily="微软雅黑" fontSize="15"  />
+		<s:Label text="分" backgroundAlpha="0" fontSize="15" color="#999999" fontFamily="微软雅黑"/>
 		<s:Image   source="assets/delIcon.png"  id="myDel"  width="80" height="48"  smooth="true"/>
 	</s:HGroup>
 	

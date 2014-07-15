@@ -34,7 +34,7 @@
 				this.addEventListener(KeyboardEvent.KEY_DOWN,KeyboardListener);
 				this.actionBar.addEventListener(MouseEvent.MOUSE_DOWN, function (e:MouseEvent):void {  
 					
-		  	 	 	NativeApplication.nativeApplication.activeWindow.startMove();
+		  	// 	 	NativeApplication.nativeApplication.activeWindow.startMove();
 					
 				})
 				 

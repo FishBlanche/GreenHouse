@@ -882,7 +882,7 @@
 											
 											default:break;
 										}
-										ig1.iSlider.value=Number(ruleArr[3])/60;
+										ig1.iSlidertime.text=(Number(ruleArr[3])/60).toString();
 										ig1.width=this.width*0.9;
 										ig1.height=this.height*0.15;
 										ig1.irrigation.source= "assets/Irri1.png";
@@ -901,7 +901,7 @@
 											
 											default:break;
 										}
-										ig2.iSlider.value=Number(ruleArr[3])/60;
+										ig2.iSlidertime.text=(Number(ruleArr[3])/60).toString();
 										ig2.width=this.width*0.9;
 										ig2.height=this.height*0.15;
 										ig2.irrigation.source="assets/Irri2.png";
@@ -920,7 +920,7 @@
 											
 											default:break;
 										}
-										ig3.iSlider.value=Number(ruleArr[3])/60;
+										ig3.iSlidertime.text=(Number(ruleArr[3])/60).toString();
 										ig3.width=this.width*0.9;
 										ig3.height=this.height*0.15;
 										ig3.irrigation.source="assets/Irri3.png";
@@ -939,7 +939,7 @@
 											 
 											default:break;
 										}
-										ig4.iSlider.value=Number(ruleArr[3])/60;
+										ig4.iSlidertime.text=(Number(ruleArr[3])/60).toString();
 										ig4.irrigation.source="assets/Irri4.png";
 										ig4.width=this.width*0.9;
 										ig4.height=this.height*0.15;
@@ -956,7 +956,7 @@
 												break;
 											default:break;
 										}
-										fgWest.fSlider.value=Number(ruleArr[3])/60;
+										fgWest.fSlidertime.text=(Number(ruleArr[3])/60).toString();
 										fgWest.width=this.width*0.9;
 										fgWest.height=this.height*0.15;
 										fgWest.fan.source="assets/westFan.png";
@@ -973,7 +973,7 @@
 												break;
 											default:break;
 										}
-										fgEast.fSlider.value=Number(ruleArr[3])/60;
+										fgEast.fSlidertime.text=(Number(ruleArr[3])/60).toString();
 										fgEast.width=this.width*0.9;
 										fgEast.height=this.height*0.15;
 										fgEast.fan.source="assets/eastFan.png";
@@ -990,7 +990,7 @@
 												break;
 											default:break;
 										}
-										hg.hSlider.value =Number(ruleArr[3])/60;
+										hg.hSlidertime.text =(Number(ruleArr[3])/60).toString();
 										hg.width=this.width*0.9;
 										hg.height=this.height*0.15;
 										hg.humidifier.source="assets/myHumi.png"
@@ -1010,7 +1010,7 @@
 												break;
 											default:break;
 										}
-										rgInner.rSlider.value=Number(ruleArr[3])/60;
+										rgInner.rSlidertime.text=(Number(ruleArr[3])/60).toString();
 										rgInner.width=this.width*0.9;
 										rgInner.height=this.height*0.15;
 										rgInner.roller.source="assets/innerRoller.png";
@@ -1030,7 +1030,7 @@
 												break;
 											default:break;
 										}
-										rgOuter.rSlider.value=Number(ruleArr[3])/60;
+										rgOuter.rSlidertime.text=(Number(ruleArr[3])/60).toString();
 										rgOuter.width=this.width*0.9;
 										rgOuter.height=this.height*0.15;
 										rgOuter.roller.source="assets/outerRoller.png";
@@ -1116,7 +1116,7 @@
 					 if(rgInner.rollerOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=rgInner.rSlider.value*60;
+						 gpStr+=int(rgInner.rSlidertime.text)*60;
 					 }
 					 else if(rgInner.rollerOff.selected)
 					 {
@@ -1126,7 +1126,7 @@
 					 else
 					 {
 						 gpStr+="2,";
-						 gpStr+=rgInner.rSlider.value*60;
+						 gpStr+=int(rgInner.rSlidertime.text)*60;
 					 }
 					 gpStr+="a";
 				 }
@@ -1137,7 +1137,7 @@
 					 if(rgOuter.rollerOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=rgOuter.rSlider.value*60;
+						 gpStr+=int(rgOuter.rSlidertime.text)*60;
 					 }
 					 else if(rgOuter.rollerOff.selected)
 					 {
@@ -1147,7 +1147,7 @@
 					 else
 					 {
 						 gpStr+="2,";
-						 gpStr+=rgOuter.rSlider.value*60;
+						 gpStr+=int(rgOuter.rSlidertime.text)*60;
 					 }
 					 gpStr+="a";
 				 }
@@ -1158,7 +1158,7 @@
 					 if(fgWest.fanOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=fgWest.fSlider.value*60;
+						 gpStr+=int(fgWest.fSlidertime.text)*60;
 					 }
 					 else
 					 {
@@ -1175,7 +1175,7 @@
 					 if(fgEast.fanOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=fgEast.fSlider.value*60;
+						 gpStr+=int(fgEast.fSlidertime.text)*60;
 					 }
 					 else
 					 {
@@ -1191,7 +1191,7 @@
 					 if(hg.humidifierOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=hg.hSlider.value*60;
+						 gpStr+=int(hg.hSlidertime.text)*60;
 					 }
 					 else
 					 {
@@ -1208,7 +1208,7 @@
 					if(ig1.waterOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=ig1.iSlider.value*60;
+						 gpStr+=int(ig1.iSlidertime.text)*60;
 					 }
 					 else
 					 {
@@ -1225,7 +1225,7 @@
 					  if(ig2.waterOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=ig2.iSlider.value*60;
+						 gpStr+=int(ig2.iSlidertime.text)*60;
 					 }
 					 else
 					 {
@@ -1242,7 +1242,7 @@
 					 if(ig3.waterOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=ig3.iSlider.value*60;
+						 gpStr+=int(ig3.iSlidertime.text)*60;
 					 }
 					 else
 					 {
@@ -1259,7 +1259,7 @@
 					 if(ig4.waterOn.selected)
 					 {
 						 gpStr+="0,";
-						 gpStr+=ig4.iSlider.value*60;
+						 gpStr+=int(ig4.iSlidertime.text)*60;
 					 }
 					 else
 					 {
@@ -1291,7 +1291,7 @@
 					{
 						if(rollerOn.selected)
 						{
-							DCRo.operation(4,8,iSlider1.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,8,int(iSlider1time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(rollerOff.selected)
 						{
@@ -1299,7 +1299,7 @@
 						}
 						else if(rollerRet.selected)
 						{
-							DCRo.operation(4,8,iSlider1.value*60,2,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,8,int(iSlider1time.text)*60,2,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1310,7 +1310,7 @@
 					{
 						if(rollerOn.selected)
 						{
-							DCRo.operation(4,9,iSlider1.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,9,int(iSlider1time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(rollerOff.selected)
 						{
@@ -1318,7 +1318,7 @@
 						}
 						else if(rollerRet.selected)
 						{
-							DCRo.operation(4,9,iSlider1.value*60,2,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,9,int(iSlider1time.text)*60,2,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1343,7 +1343,7 @@
 					{
 						if(fanOn.selected)
 						{
-							DCRo.operation(2,5,iSlider2.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(2,5,int(iSlider2time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(fanOff.selected)
 						{
@@ -1358,7 +1358,7 @@
 					{
 						if(fanOn.selected)
 						{
-							DCRo.operation(2,6,iSlider2.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(2,6,int(iSlider2time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(fanOff.selected)
 						{
@@ -1385,7 +1385,7 @@
 				{
 					if(humidifierOn.selected)
 					{
-						DCRo.operation(3,7,iSlider3.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+						DCRo.operation(3,7,int(iSlider3time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 					}
 					else if(humidifierOff.selected)
 					{
@@ -1410,7 +1410,7 @@
 					{
 						if(waterOn.selected)
 						{
-							DCRo.operation(1,1,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,1,int(iSlider4time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(waterOff.selected)
 						{
@@ -1425,7 +1425,7 @@
 					{
 						if(waterOn.selected)
 						{
-							DCRo.operation(1,2,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,2,int(iSlider4time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(waterOff.selected)
 						{
@@ -1440,7 +1440,7 @@
 					{
 						if(waterOn.selected)
 						{
-							DCRo.operation(1,3,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,3,int(iSlider4time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(waterOff.selected)
 						{
@@ -1455,7 +1455,7 @@
 					{
 						if(waterOn.selected)
 						{
-							DCRo.operation(1,4,iSlider4.value*60,0,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(1,4,int(iSlider4time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(waterOff.selected)
 						{
@@ -1610,8 +1610,9 @@
 					<s:Image id="rdur" source="assets/duration.png" width="90" height="90"  smooth="true"/>
 					
 					<s:HGroup  height="100%" verticalAlign="middle" width="25%">
-						<mx:HSlider     trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider1"  
-						 dataTipFormatFunction="dataFormat"			 minimum="0" maximum="20" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="5"  labelStyleName="sliderLabel"  labels="[0,5,10,15,20]"   snapInterval="1"   allowTrackClick="true" liveDragging="false"/>
+ 						<s:TextInput restrict="0-9"  width="80%"  skinClass="spark.skins.mobile.TextInputSkin" color="#999999" verticalCenter="0"   id="iSlider1time"   fontFamily="微软雅黑" fontSize="15"  />
+						<s:Label text="分" backgroundAlpha="0" fontSize="15" color="#999999" fontFamily="微软雅黑"/>
+
 					</s:HGroup>
 					
 					<s:Button   click="roller_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
@@ -1635,8 +1636,9 @@
 					<s:Image id="fdur" source="assets/duration.png" width="90" height="90"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
-						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider2"  
-									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="180"  labelStyleName="sliderLabel"  labels="[0,180,360,540,720]" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
+ 						<s:TextInput restrict="0-9"    width="80%" skinClass="spark.skins.mobile.TextInputSkin" color="#999999" verticalCenter="0"   id="iSlider2time"   fontFamily="微软雅黑" fontSize="15" />
+						<s:Label text="分" backgroundAlpha="0" fontSize="15" color="#999999" fontFamily="微软雅黑"/>
+
 					</s:HGroup>
 					<s:Button click="fan_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  width="95" height="60"     label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
@@ -1654,8 +1656,9 @@
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
 						
-						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider3"  
-									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="180"  labelStyleName="sliderLabel"  labels="[0,180,360,540,720]" snapInterval="30"   allowTrackClick="true" liveDragging="false"/>
+ 						<s:TextInput restrict="0-9"  width="80%"  skinClass="spark.skins.mobile.TextInputSkin" color="#999999" verticalCenter="0"   id="iSlider3time"   fontFamily="微软雅黑" fontSize="15" />
+						<s:Label text="分" backgroundAlpha="0" fontSize="15" color="#999999" fontFamily="微软雅黑"/>
+
 					</s:HGroup>
 					<s:Button click="humidifier_set(event)" skinClass="skins.CustomizeButtonSkin" color="white" width="95" height="60"    label="确定" horizontalCenter="0" verticalCenter="0"       fontSize="25"/>
 				</s:HGroup>
@@ -1680,8 +1683,9 @@
 					<s:Image id="idur" source="assets/duration.png" width="90" height="90"  smooth="true"/>
 					
 					<s:HGroup width="25%"  height="100%" verticalAlign="middle">
-						<mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="100%"    id="iSlider4"  
-									 dataTipFormatFunction="dataFormat"		 minimum="0" maximum="120" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="30"  labelStyleName="sliderLabel"  labels="[0,30,60,90,120]" snapInterval="10"   allowTrackClick="true" liveDragging="false"/>
+						 
+						<s:TextInput restrict="0-9"   width="80%"  skinClass="spark.skins.mobile.TextInputSkin" color="#999999" verticalCenter="0"   id="iSlider4time"   fontFamily="微软雅黑" fontSize="15"  />
+                         <s:Label text="分" backgroundAlpha="0" fontSize="15" color="#999999" fontFamily="微软雅黑"/>
 					</s:HGroup>
 					<s:Button click="irrigation_set(event)" skinClass="skins.CustomizeButtonSkin" color="white"  horizontalCenter="0" verticalCenter="0"  width="95" height="60"   label="确定"      fontSize="25"/>
 				</s:HGroup>

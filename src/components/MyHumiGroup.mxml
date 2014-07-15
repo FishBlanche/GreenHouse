@@ -7,6 +7,7 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import spark.skins.mobile.TextInputSkin;
 			private	function dataFormat(value:Number):String {
 				
 				return   "持续" + value+"分钟";
@@ -29,8 +30,8 @@
 							label="关" skinClass="skins.RightButtonSkin" />
 		</s:HGroup>
 		<s:Image id="htime" source="assets/duration.png" width="80" height="48"  smooth="true"/>
-		 <mx:HSlider  trackSkin="@Embed('assets/track.png')" thumbSkin="@Embed('assets/thumb.png')"   horizontalCenter="0"  verticalCenter="0"      height="100%"      width="30%"    id="hSlider"  
-					  dataTipFormatFunction="dataFormat"			 minimum="0" maximum="720" dataTipOffset="6"      dataTipPlacement="top"   tickColor="#1d953f" tickInterval="180"  labelStyleName="sliderLabel"  labels="[0,180,360,540,720]" snapInterval="30"   allowTrackClick="true" liveDragging="true"/>
+ 		<s:TextInput restrict="0-9"   width="10%"  skinClass="spark.skins.mobile.TextInputSkin" color="#999999" verticalCenter="0"   id="hSlidertime"   fontFamily="微软雅黑" fontSize="15" />
+		<s:Label text="分" backgroundAlpha="0" fontSize="15" color="#999999" fontFamily="微软雅黑"/>
 		<s:Image   source="assets/delIcon.png"  id="myDel"  width="80" height="48"  smooth="true"/>		
 	</s:HGroup>
 	
