@@ -2,6 +2,12 @@
 <s:View xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark"   xmlns:comps="comps.*"    backgroundAlpha="0.3"    xmlns:mx="library://ns.adobe.com/flex/mx" initialize="init()" removedFromStage="remove_Handle()"  creationComplete="create()" xmlns:components="components.*" xmlns:views="views.*">
 	<fx:Declarations>
+		<s:Elastic id="es"/>
+		<s:Sequence id="sq" >
+			<s:Rotate id="r1" target="{dir}" easer="{es}" angleBy="20" autoCenterTransform="true"/>
+			<s:Rotate id="r2" target="{dir}" easer="{es}" angleBy="-40" autoCenterTransform="true"/>
+			<s:Rotate id="r3" target="{dir}" easer="{es}" angleBy="20" autoCenterTransform="true"/>
+		</s:Sequence>
 	</fx:Declarations>
 		<fx:Style>
 		@namespace "library://ns.adobe.com/flex/spark";
@@ -492,6 +498,7 @@
 	<components:RealDataGroup backgroundImage="@Embed('assets/area2.png')" id="rdg2" width="35%" height="100%"/>
 	<components:RealDataGroup backgroundImage="@Embed('assets/area4.png')" id="rdg4" width="35%" height="100%"/>
 	<components:RealDataGroup backgroundImage="@Embed('assets/area3.png')" id="rdg3" width="35%" height="100%"/>
+	<s:Image  smooth="true" id="dir"  rollOver="sq.end();sq.play();"    x="{this.width-130}" y="15" source="assets/directionshow.png" horizontalAlign="right" verticalAlign="top"/>
 	 <!--s:VGroup   gap="27"  horizontalAlign="center"  verticalAlign="middle"  height="{this.height}" width="{this.width}">
 		 <s:HGroup gap="27" width="80%" height="40%" horizontalAlign="center" verticalAlign="middle">
 			 <components:RealDataGroup  backgroundImage="@Embed('assets/area1.png')" id="rdg1" width="35%" height="100%"/>
