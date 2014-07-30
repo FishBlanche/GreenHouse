@@ -9,12 +9,11 @@
 			showPromptWhenFocused: false;
 			borderVisible:false;
 		}
-		 
-			.sliderLabel
-			{
-				color: #1d953f;
-				fontSize: 13;
-			}
+		.sliderLabel
+		{
+			color: #1d953f;
+			fontSize: 13;
+		}
 	</fx:Style>
 	<fx:Declarations>
 	 

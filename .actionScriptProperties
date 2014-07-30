@@ -23,9 +23,9 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/spark_dmv.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_dmv.swc" useDefaultLinkType="false"/>
-          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/air/airframework.swc" useDefaultLinkType="false"/>
-          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/air/applicationupdater_ui.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_flashflexkit.swc" useDefaultLinkType="false"/>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/air/applicationupdater_ui.swc" useDefaultLinkType="false"/>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/air/airframework.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_agent.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
@@ -47,8 +47,9 @@
   <buildCSSFiles/>
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
   <buildTargets>
-    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="B:/iOS闂傚倷娴囧畷鍨叏閺夋嚚娲晲閸滀焦宸ラ梺鍦劋椤ㄦ粎绮堟径鎰叆闁绘棁娅ｉ妶鐜眀ile闂傚倷娴囧畷鍨叏閺夋嚚娲晲閸滀焦宸ラ梺鍦劋椤ㄦ粎绮堟径鎰叆闁绘柨鎼畷鐒憌.mobileprovision" releasePackageType="ipa-app-store">
-      <airSettings airCertificatePath="B:/iOS闂傚倷娴囧畷鍨叏閺夋嚚娲晲閸滀焦宸ラ梺鍦劋椤ㄦ粎绮堟径鎰叆闁绘棁娅ｉ妶鐜眀ile闂傚倷娴囧畷鍨叏閺夋嚚娲晲閸滀焦宸ラ梺鍦劋椤ㄦ粎绮堟径鎰叆闁绘梻鍎ょ亸鍗檈ngdong.p12" airTimestamp="true" anePathSet="true" version="1">
+    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="B:/iOS闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻濞咃綁濡堕悳鐪�le闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻煥閹碱偄鐣烽悞鎲�mobileprovision" releasePackageType="ipa-app-store">
+      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" reducedSizePackaging="false" version="1"/>
+      <airSettings airCertificatePath="B:/iOS闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻濞咃綁濡堕悳鐪�le闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻⒒閸庛倗浜搁崡妾坣gdong.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>
         <newLaunchParams/>
@@ -56,11 +57,11 @@
         <newPackagingParams/>
         <modifiedPackagingParams/>
       </airSettings>
-      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" reducedSizePackaging="false" version="1"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget airDownloadURL="https://market.android.com/details?id=com.adobe.air" androidSettingsVersion="2" buildTargetName="device" isCurrent="true" platformId="com.adobe.flexide.multiplatform.android.platform">
-      <airSettings airCertificatePath="B:/iOS闁荤姴娲ｅ鎺楀礉閿熺祫obile闁荤姴娲ｅ鎺楀礉閿熺禈ndroid.p12" airTimestamp="true" anePathSet="true" version="1">
+      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" reducedSizePackaging="false" version="1"/>
+      <airSettings airCertificatePath="B:/iOS闂佽崵濮村ú锝咁湤閹烘绀夐柨鐔虹カobile闂佽崵濮村ú锝咁湤閹烘绀夐柨鐔虹ndroid.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>
         <newLaunchParams/>
@@ -68,7 +69,6 @@
         <newPackagingParams/>
         <modifiedPackagingParams/>
       </airSettings>
-      <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" reducedSizePackaging="false" version="1"/>
       <actionScriptSettings version="1"/>
     </buildTarget>
     <buildTarget buildTargetName="default" isCurrent="true" platformId="default">
