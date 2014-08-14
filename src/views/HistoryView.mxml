@@ -306,12 +306,13 @@
 				return tempArr;
 			}
 			private function enter_submit(event:FlexEvent):void{
-				stage.focus=null;
+				
 				search_click();
 			}
 		 
 		
 			private function search_click():void{
+				stage.focus=null;
 				if(numReg.test(StringUtil.trim(myday.text)))
 				{
 					//trace("yes");

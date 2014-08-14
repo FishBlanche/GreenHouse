@@ -16,16 +16,16 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/utilities.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/flex.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/sparkskins.swc" useDefaultLinkType="false"/>
-          <libraryPathEntry kind="3" linkType="2" path="${PROJECT_FRAMEWORKS}/{airHome}/frameworks/libs/air/airglobal.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/qtp_air.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/datavisualization.swc" useDefaultLinkType="false"/>
+          <libraryPathEntry kind="3" linkType="2" path="${PROJECT_FRAMEWORKS}/{airHome}/frameworks/libs/air/airglobal.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/core.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/spark_dmv.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_dmv.swc" useDefaultLinkType="false"/>
-          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_flashflexkit.swc" useDefaultLinkType="false"/>
-          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/air/applicationupdater_ui.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/air/airframework.swc" useDefaultLinkType="false"/>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/air/applicationupdater_ui.swc" useDefaultLinkType="false"/>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_flashflexkit.swc" useDefaultLinkType="false"/>
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/automation_agent.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
@@ -47,9 +47,9 @@
   <buildCSSFiles/>
   <flashCatalyst validateFlashCatalystCompatibility="false"/>
   <buildTargets>
-    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="B:/iOS闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻濞咃綁濡堕悳鐪�le闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻煥閹碱偄鐣烽悞鎲�mobileprovision" releasePackageType="ipa-app-store">
+    <buildTarget buildTargetName="device" iosSettingsVersion="2" isCurrent="true" platformId="com.adobe.flexide.multiplatform.ios.platform" provisioningFile="B:/iOS证书/Mobile证书/RunApp.mobileprovision" releasePackageType="ipa-ad-hoc">
       <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.ios.platform" reducedSizePackaging="false" version="1"/>
-      <airSettings airCertificatePath="B:/iOS闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻濞咃綁濡堕悳鐪�le闂傚倸鍊峰ù鍥х暦閸偅鍙忛柡澶嬪殮濞差亝鏅查柛婊�劍瀹搞儵姊洪崷顓炲妺妞ゃ劍绮庣划鍫熷緞閹邦厾鍙嗛梺缁樻⒒閸庛倗浜搁崡妾坣gdong.p12" airTimestamp="true" anePathSet="true" version="1">
+      <airSettings airCertificatePath="B:/iOS证书/Mobile证书/zhengdong.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>
         <newLaunchParams/>
@@ -61,7 +61,7 @@
     </buildTarget>
     <buildTarget airDownloadURL="https://market.android.com/details?id=com.adobe.air" androidSettingsVersion="2" buildTargetName="device" isCurrent="true" platformId="com.adobe.flexide.multiplatform.android.platform">
       <multiPlatformSettings enabled="true" hideAneLibSymbols="0" includePlatformLibs="false" platformID="com.adobe.flexide.multiplatform.android.platform" reducedSizePackaging="false" version="1"/>
-      <airSettings airCertificatePath="B:/iOS闂佽崵濮村ú锝咁湤閹烘绀夐柨鐔虹カobile闂佽崵濮村ú锝咁湤閹烘绀夐柨鐔虹ndroid.p12" airTimestamp="true" anePathSet="true" version="1">
+      <airSettings airCertificatePath="B:/iOS证书/Mobile证书/android.p12" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>
         <newLaunchParams/>

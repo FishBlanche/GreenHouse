@@ -113,7 +113,7 @@
 		<!-- Display Resolution for the app (either "standard" or "high"). Optional, OSX-only. Default "standard" -->
 		<!-- <requestedDisplayResolution></requestedDisplayResolution> -->
 	<autoOrients>false</autoOrients>
-	<aspectRatio>portrait</aspectRatio>
+	<aspectRatio>landscape</aspectRatio>
         <fullScreen>true</fullScreen>
         <x>20</x>
         <y>20</y>
@@ -174,10 +174,10 @@
 		<image1024x1024></image1024x1024>
 	</icon> -->
     <icon>
-    <image16x16>assets/ICON16.png</image16x16> 
-	<image32x32>assets/ICON32.png</image32x32> 
-	<image48x48>assets/ICON48.png</image48x48>  
-	<image128x128>assets/ICON128.png</image128x128> 
+    <image16x16>ICON16.png</image16x16> 
+	<image32x32>ICON32.png</image32x32> 
+	<image48x48>ICON48.png</image48x48>  
+	<image128x128>ICON128.png</image128x128> 
       <image57x57>assets/greenhouse57.png</image57x57>
       <image72x72>assets/greenhouse72.png</image72x72>
    </icon>

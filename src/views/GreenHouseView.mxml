@@ -440,7 +440,8 @@
 				}
 				 login.width=210;
 				 login.height=100;
-				 login.x=evt.stageX-120;
+				 //	 login.x=evt.stageX-120;//air
+				 login.x=evt.stageX-200;//pad
 				 login.y=evt.stageY-15;
 			     this.addElement(login);
 				 loginShow=true;
@@ -458,7 +459,8 @@
 				}
 				connectGp.width=210;
 				connectGp.height=100;
-				connectGp.x=evt.stageX-120;
+				//	connectGp.x=evt.stageX-120;//air
+					connectGp.x=evt.stageX-150;//pad
 				connectGp.y=evt.stageY-15;
 				this.addElement(connectGp);
 				connectShow=true;
@@ -472,21 +474,20 @@
 		<s:Spacer width="5"/>
 		<s:Image id="splitshow" source="@Embed('assets/split.png')"     smooth="true" />
 		<s:Spacer width="5"/>
-		<s:Image id="controlshow" click="control_view()"	source="assets/control_btn.png"     smooth="true" />  
+		<s:Image buttonMode="true" id="controlshow" click="control_view()"	source="assets/control_btn.png"     smooth="true" />  
 	 </s:navigationContent>
 	 
 	<s:actionContent>
 		<s:HGroup verticalAlign="middle">
- 			<!--s:Image id="ishow" source="@Embed('assets/addr.png')"  click="show_Handle()"  smooth="true" /-->
 			<s:Image id="splitshow1" source="@Embed('assets/split.png')"     smooth="true" />
-		    <s:Label text="设置" fontSize="20" color="#999999" click="show_connect(event)"  fontFamily="微软雅黑"   verticalAlign="middle"/>
+		    <s:Label buttonMode="true" text="设置" fontSize="20" color="#999999" click="show_connect(event)"  fontFamily="微软雅黑"   verticalAlign="middle"/>
 			<s:Image id="splitshow4" source="@Embed('assets/split.png')"     smooth="true" />
-			<s:Label text="登录" fontSize="20" color="#999999"  fontFamily="微软雅黑" click="show_login(event)"   verticalAlign="middle"/>
-			<s:Image id="splitshow2" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Label buttonMode="true" text="登录" fontSize="20" color="#999999"  fontFamily="微软雅黑" click="show_login(event)"   verticalAlign="middle"/>
+			<!--s:Image id="splitshow2" source="@Embed('assets/split.png')"     smooth="true" />
 			<s:Image id="changesizeshow" source="@Embed('assets/max.png')"  buttonMode="true" click="resize_app()"    smooth="true" />
 			<s:Image id="splitshow3" source="@Embed('assets/split.png')"     smooth="true" />
 			<s:Image id="closeshow" source="@Embed('assets/close_btn.png')"  buttonMode="true" click="close_app()"    smooth="true" />
-			<s:Spacer width="5"/>
+			<s:Spacer width="5"/-->
  		</s:HGroup>
 	</s:actionContent>
 	 

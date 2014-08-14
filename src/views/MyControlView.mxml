@@ -1003,9 +1003,9 @@
 										{
 											case "0":rgInner.rollerOn.selected=true;rgInner.rollerOff.selected=false;rgInner.rollerRet.selected =false;
 												break;
-											case "1":rgInner.rollerOff.selected = true;rgInner.rollerOn.selected=false;rgInner.rollerRet.selected =false;
+											case "2":rgInner.rollerOff.selected = true;rgInner.rollerOn.selected=false;rgInner.rollerRet.selected =false;
 												break;
-											case "2":rgInner.rollerRet.selected = true;rgInner.rollerOff.selected=false;rgInner.rollerOn.selected=false;
+											case "1":rgInner.rollerRet.selected = true;rgInner.rollerOff.selected=false;rgInner.rollerOn.selected=false;
 												break;
 											default:break;
 										}
@@ -1023,9 +1023,9 @@
 										{
 											case "0":rgOuter.rollerOn.selected=true;rgOuter.rollerOff.selected=false;rgOuter.rollerRet.selected =false;
 												break;
-											case "1":rgOuter.rollerOff.selected = true;rgOuter.rollerOn.selected=false;rgOuter.rollerRet.selected =false;
+											case "2":rgOuter.rollerOff.selected = true;rgOuter.rollerOn.selected=false;rgOuter.rollerRet.selected =false;
 												break;
-											case "2":rgOuter.rollerRet.selected = true;rgOuter.rollerOff.selected=false;rgOuter.rollerOn.selected=false;
+											case "1":rgOuter.rollerRet.selected = true;rgOuter.rollerOff.selected=false;rgOuter.rollerOn.selected=false;
 												break;
 											default:break;
 										}
@@ -1119,12 +1119,12 @@
 					 }
 					 else if(rgInner.rollerOff.selected)
 					 {
-						 gpStr+="1,";
+						 gpStr+="2,";
 						 gpStr+=0;
 					 }
 					 else
 					 {
-						 gpStr+="2,";
+						 gpStr+="1,";
 						 gpStr+=int(rgInner.rSlidertime.text)*60;
 					 }
 					 gpStr+="a";
@@ -1140,12 +1140,12 @@
 					 }
 					 else if(rgOuter.rollerOff.selected)
 					 {
-						 gpStr+="1,";
+						 gpStr+="2,";
 						 gpStr+=0;
 					 }
 					 else
 					 {
-						 gpStr+="2,";
+						 gpStr+="1,";
 						 gpStr+=int(rgOuter.rSlidertime.text)*60;
 					 }
 					 gpStr+="a";
@@ -1294,11 +1294,11 @@
 						}
 						else if(rollerOff.selected)
 						{
-							DCRo.operation(4,8,0,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,8,0,2,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(rollerRet.selected)
 						{
-							DCRo.operation(4,8,int(iSlider1time.text)*60,2,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,8,int(iSlider1time.text)*60,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1313,11 +1313,11 @@
 						}
 						else if(rollerOff.selected)
 						{
-							DCRo.operation(4,9,0,1,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,9,0,2,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else if(rollerRet.selected)
 						{
-							DCRo.operation(4,9,int(iSlider1time.text)*60,2,FlexGlobals.topLevelApplication.currentUser);
+							DCRo.operation(4,9,int(iSlider1time.text)*60,1,FlexGlobals.topLevelApplication.currentUser);
 						}
 						else
 						{
@@ -1508,7 +1508,8 @@
 				}
 				login.width=210;
 				login.height=100;
-				login.x=evt.stageX-120;
+				//login.x=evt.stageX-120;
+					login.x=evt.stageX-200;
 				login.y=evt.stageY-15;
 				this.addElement(login);
 				loginShow=true;
@@ -1526,7 +1527,8 @@
 				}
 				connectGp.width=210;
 				connectGp.height=100;
-				connectGp.x=evt.stageX-120;
+				//	connectGp.x=evt.stageX-120;
+					connectGp.x=evt.stageX-150;
 				connectGp.y=evt.stageY-15;
 				this.addElement(connectGp);
 				connectShow=true;
@@ -1553,9 +1555,9 @@
 	</s:states>
 	<s:navigationContent>
 		<s:Spacer width="25"/>
-		<s:Image id="historyshow" click="data_view()" source="assets/history_btn.png"     smooth="true" />
+		<s:Image buttonMode="true" id="historyshow" click="data_view()" source="assets/history_btn.png"     smooth="true" />
 		<s:Image id="splitshow" source="@Embed('assets/split.png')"     smooth="true" />
-		<s:Image id="controlshow" 	source="assets/control_active.png"     smooth="true" />  
+		<s:Image buttonMode="true" id="controlshow" 	source="assets/control_active.png"     smooth="true" />  
 		
 		
 	</s:navigationContent>
@@ -1567,14 +1569,14 @@
 		<s:HGroup verticalAlign="middle">
 			<!--s:Image id="ishow" source="@Embed('assets/addr.png')"  click="show_Handle()"  smooth="true" /-->
 			<s:Image id="splitshow1" source="@Embed('assets/split.png')"     smooth="true" />
-			<s:Label text="设置" fontSize="20" color="#999999" click="show_connect(event)"  fontFamily="微软雅黑"   verticalAlign="middle"/>
-			<s:Image id="splitshow4" source="@Embed('assets/split.png')"     smooth="true" />
+			<s:Label buttonMode="true" text="设置" fontSize="20" color="#999999" click="show_connect(event)"  fontFamily="微软雅黑"   verticalAlign="middle"/>
+			<s:Image buttonMode="true" id="splitshow4" source="@Embed('assets/split.png')"     smooth="true" />
 			<s:Label text="登录" fontSize="20" color="#999999"  fontFamily="微软雅黑" click="show_login(event)"   verticalAlign="middle"/>
-			<s:Image id="splitshow2" source="@Embed('assets/split.png')"     smooth="true" />
+			<!--s:Image id="splitshow2" source="@Embed('assets/split.png')"     smooth="true" />
 			<s:Image id="changesizeshow" source="@Embed('assets/max.png')"  buttonMode="true" click="resize_app()"    smooth="true" />
 			<s:Image id="splitshow3" source="@Embed('assets/split.png')"     smooth="true" />
 			<s:Image id="closeshow" source="@Embed('assets/close_btn.png')"  buttonMode="true" click="close_app()"    smooth="true" />
-			<s:Spacer width="5"/>
+			<s:Spacer width="5"/-->
 		</s:HGroup>
 	 
 	</s:actionContent>
