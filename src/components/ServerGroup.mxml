@@ -48,26 +48,53 @@
 				connect_btn.visible=false;
 				 
 				if(ipReg.test(ipaddr.text)&&portReg.test(iport.text)){
-		         var persistencemanager:PersistenceManager=new PersistenceManager();
-				if(persistencemanager.load())
-				{
-				   persistencemanager.setProperty("serverAddress","http://"+ipaddr.text+":"+iport.text+"/greenhouse-server/messagebroker/amf");
-				   persistencemanager.setProperty("serverIp",ipaddr.text);
-				   persistencemanager.setProperty("serverPort",iport.text);
-				   persistencemanager.save();
-				   lmessage.text="设置成功!";
-				}
-				else
-				{
-					lmessage.text="设置失败!";
-				}
+					
+					myAMF.url="http://"+ipaddr.text+":"+iport.text+"/greenhouse-server/messagebroker/amf";
+					
+					channelSet.addChannel(myAMF); 
+					ro.channelSet = channelSet;
+					ro.destination="ConnectService";
+					ro.addEventListener(ResultEvent.RESULT,ds_resulted);
+					ro.addEventListener(FaultEvent.FAULT,faultHandle);
+					ro.getConnect();
+		       
 				}
 				else{
 				 
 				lmessage.text="格式有误!";
 				} 
 			}
-			 
+			private  function  faultHandle(event:FaultEvent):void
+			{ 
+				trace(" request error");
+				trace(event.fault.faultString);
+				trace(event.fault.faultDetail);
+				lmessage.text="设置失败!";
+			}
+			
+			private function ds_resulted(event:ResultEvent):void{
+				if(String(event.result)=="ok")
+				{
+					var persistencemanager:PersistenceManager=new PersistenceManager();
+					if(persistencemanager.load())
+					{
+						persistencemanager.setProperty("serverAddress","http://"+ipaddr.text+":"+iport.text+"/greenhouse-server/messagebroker/amf");
+						persistencemanager.setProperty("serverIp",ipaddr.text);
+						persistencemanager.setProperty("serverPort",iport.text);
+						persistencemanager.save();
+						lmessage.text="设置成功!";
+					}
+					else
+					{
+						lmessage.text="设置失败!";
+					}
+				}
+				else
+				{
+					lmessage.text="设置失败!";
+				}
+				
+			}
 		]]>
 	</fx:Script>
 	<s:states>

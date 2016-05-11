@@ -5,10 +5,10 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	<s:SplashScreenImageSource
-		source="@Embed('assets/768_1024.jpg')"		
+		source="@Embed('assets/768_1024version.png')"		
 		aspectRatio="portrait"/>
 	<s:SplashScreenImageSource
-		source="@Embed('assets/1024_768.jpg')"	
+		source="@Embed('assets/1024_768version.png')"	
 		aspectRatio="landscape"/>
 	
 </s:SplashScreenImage>

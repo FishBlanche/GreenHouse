@@ -1286,6 +1286,7 @@
 				btn_move.play();
 				if(AccessServer())
 				{
+					lmessage.text="发送成功";
 					if(roller1.selected)
 					{
 						if(rollerOn.selected)
@@ -1338,6 +1339,7 @@
 				btn_move.play();
 				if(AccessServer())
 				{
+					lmessage.text="发送成功";
 					if(fan1.selected)
 					{
 						if(fanOn.selected)
@@ -1382,6 +1384,7 @@
 				btn_move.play();
 				if(AccessServer())
 				{
+					lmessage.text="发送成功";
 					if(humidifierOn.selected)
 					{
 						DCRo.operation(3,7,int(iSlider3time.text)*60,0,FlexGlobals.topLevelApplication.currentUser);
@@ -1405,6 +1408,7 @@
 				btn_move.play();
 				if(AccessServer())
 				{
+					lmessage.text="发送成功";
 					if(water1.selected)
 					{
 						if(waterOn.selected)
